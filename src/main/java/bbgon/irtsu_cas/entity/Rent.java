@@ -10,20 +10,22 @@ import java.util.UUID;
 @Entity
 @Getter
 @Setter
-public class Details {
+public class Rent {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    private String name;
-    private String description;
-    private String documentation;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private Users userRent;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "owner_id")
-    private Users owner;
+    @JoinColumn(name = "detail_id")
+    private Details detailRent;
 
-    private String status;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
 
-    private LocalDateTime createdDetail;
+    private String rentalStatus;
 }

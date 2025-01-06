@@ -3,6 +3,8 @@ package bbgon.irtsu_cas.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,9 +23,11 @@ public class Users {
     private String email;
     private String password;
     private String position;
-    private String wayToImage;
+    private String avtar;
     private String phone;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Details> ownParts;
+    @OneToMany(mappedBy = "owner",cascade = CascadeType.ALL)
+    private List<Details> userDetails;
+
+    private LocalDateTime createdAccount;
 }
