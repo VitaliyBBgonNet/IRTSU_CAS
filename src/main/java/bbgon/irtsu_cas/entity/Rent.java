@@ -18,7 +18,7 @@ public class Rent {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private Users userRent;
+    private UsersEntity userRent;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "detail_id")

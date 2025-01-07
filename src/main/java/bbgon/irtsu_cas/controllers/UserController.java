@@ -1,4 +1,4 @@
-package bbgon.irtsu_cas.controllers.testController;
+package bbgon.irtsu_cas.controllers;
 
 import bbgon.irtsu_cas.dto.UserRegistrationDTO;
 import bbgon.irtsu_cas.services.UserService;

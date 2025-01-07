@@ -21,7 +21,7 @@ public class Details {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id")
-    private Users owner;
+    private UsersEntity owner;
 
     private String status;
 
