@@ -16,4 +16,6 @@ public class DetailProperties {
     String status;
 
     String documentation;
+
+    String image;
 }

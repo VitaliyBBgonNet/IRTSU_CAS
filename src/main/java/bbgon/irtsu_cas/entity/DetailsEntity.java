@@ -15,6 +15,8 @@ public class DetailsEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
+    private String image;
+
     private String name;
     private String description;
     private String documentation;
