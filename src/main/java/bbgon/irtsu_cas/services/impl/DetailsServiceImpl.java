@@ -7,7 +7,6 @@ import bbgon.irtsu_cas.dto.response.OwnerDTO;
 import bbgon.irtsu_cas.dto.response.PageableResponse;
 import bbgon.irtsu_cas.entity.DetailsEntity;
 import bbgon.irtsu_cas.repositories.DetailsRepository;
-import bbgon.irtsu_cas.repositories.UserRepository;
 import bbgon.irtsu_cas.services.DetailsService;
 import bbgon.irtsu_cas.services.UserService;
 import lombok.RequiredArgsConstructor;
@@ -62,14 +61,7 @@ public class DetailsServiceImpl implements DetailsService {
         return detailsEntityPage.stream().map(
                 detailsEntity -> {
 
-                    OwnerDTO ownerDTO = new OwnerDTO();
-                    ownerDTO.setId(detailsEntity.getOwner().getId());
-                    ownerDTO.setName(detailsEntity.getOwner().getName());
-                    ownerDTO.setLastName(detailsEntity.getOwner().getLastName());
-                    ownerDTO.setSurname(detailsEntity.getOwner().getSurname());
-                    ownerDTO.setAvtar(detailsEntity.getOwner().getName());
-                    ownerDTO.setEmail(detailsEntity.getOwner().getEmail());
-                    ownerDTO.setPhone(detailsEntity.getOwner().getPhone());
+                    OwnerDTO ownerDTO = getOwnerDTO(detailsEntity);
 
                     DetailResponse response = new DetailResponse();
                     response.setId(detailsEntity.getId());
@@ -83,5 +75,17 @@ public class DetailsServiceImpl implements DetailsService {
                     return response;
                 }
         ).toList();
+    }
+
+    private OwnerDTO getOwnerDTO(DetailsEntity detailsEntity) {
+        OwnerDTO ownerDTO = new OwnerDTO();
+        ownerDTO.setId(detailsEntity.getOwner().getId());
+        ownerDTO.setName(detailsEntity.getOwner().getName());
+        ownerDTO.setLastName(detailsEntity.getOwner().getLastName());
+        ownerDTO.setSurname(detailsEntity.getOwner().getSurname());
+        ownerDTO.setAvtar(detailsEntity.getOwner().getName());
+        ownerDTO.setEmail(detailsEntity.getOwner().getEmail());
+        ownerDTO.setPhone(detailsEntity.getOwner().getPhone());
+        return ownerDTO;
     }
 }
