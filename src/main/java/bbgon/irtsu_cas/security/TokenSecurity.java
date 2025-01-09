@@ -1,6 +1,5 @@
 package bbgon.irtsu_cas.security;
 
-
 import bbgon.irtsu_cas.constants.StringConstants;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

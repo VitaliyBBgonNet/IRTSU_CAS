@@ -1,14 +1,11 @@
 package bbgon.irtsu_cas.security;
-
-//import com.dunice.GoncharovVVAdvancedServer.constants.ErrorCodes;
-//import com.dunice.GoncharovVVAdvancedServer.exeception.CustomException;
-//import com.dunice.GoncharovVVAdvancedServer.repository.AuthRepository;
 import bbgon.irtsu_cas.CustomException;
 import bbgon.irtsu_cas.repositories.AuthRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
+
 import java.util.UUID;
 
 @Component

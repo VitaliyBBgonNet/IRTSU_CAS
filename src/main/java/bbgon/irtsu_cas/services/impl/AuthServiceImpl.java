@@ -1,12 +1,14 @@
-package bbgon.irtsu_cas.services;
+package bbgon.irtsu_cas.services.impl;
 
 import bbgon.irtsu_cas.CustomException;
+import bbgon.irtsu_cas.dto.request.AuthUserRequest;
 import bbgon.irtsu_cas.dto.request.RegistrationUserRequest;
 import bbgon.irtsu_cas.dto.response.CustomSuccessResponse;
 import bbgon.irtsu_cas.dto.response.LoginUserResponse;
 import bbgon.irtsu_cas.entity.UsersEntity;
 import bbgon.irtsu_cas.repositories.AuthRepository;
 import bbgon.irtsu_cas.security.TokenSecurity;
+import bbgon.irtsu_cas.services.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -46,6 +48,23 @@ public class AuthServiceImpl implements AuthService {
                 .getSurname());
         loginUserResponse.setToken(jwtToken.generateToken(usersEntity.getId()));
 
+        return new CustomSuccessResponse<>(loginUserResponse);
+    }
+
+    @Override
+    public CustomSuccessResponse<LoginUserResponse> authorizationUser(AuthUserRequest requestForAuthorization) {
+
+        UsersEntity usersEntity = authRepository.findByEmail(requestForAuthorization.getEmail())
+                .orElseThrow(() -> new CustomException("USER_NOT_FOUND"));
+
+        if (!passwordEncoder.matches(requestForAuthorization.getPassword(), usersEntity.getPassword())) {
+            throw new CustomException("USER_PASSWORD_NOT_VALID");
+        }
+
+        LoginUserResponse loginUserResponse = new LoginUserResponse();
+        loginUserResponse.setEmail(requestForAuthorization.getEmail());
+        loginUserResponse.setFIO(usersEntity.getName() +" "+usersEntity.getLastName()+" "+usersEntity.getSurname());
+        loginUserResponse.setToken(jwtToken.generateToken(usersEntity.getId()));
         return new CustomSuccessResponse<>(loginUserResponse);
     }
 }

@@ -10,7 +10,7 @@ import java.util.UUID;
 @Entity
 @Getter
 @Setter
-public class Details {
+public class DetailsEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;

@@ -1,5 +1,6 @@
 package bbgon.irtsu_cas.controllers;
 
+import bbgon.irtsu_cas.dto.request.AuthUserRequest;
 import bbgon.irtsu_cas.dto.request.RegistrationUserRequest;
 import bbgon.irtsu_cas.dto.response.CustomSuccessResponse;
 import bbgon.irtsu_cas.dto.response.LoginUserResponse;
@@ -24,6 +25,14 @@ public class AuthController {
             @RequestBody
             @Valid RegistrationUserRequest registration) {
         return ResponseEntity.ok(authService.registrationUser(registration));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<CustomSuccessResponse<LoginUserResponse>> authorizationUser(
+            @RequestBody
+            @Valid AuthUserRequest authUserRequest) {
+
+        return ResponseEntity.ok(authService.authorizationUser(authUserRequest));
     }
 
 }

@@ -22,7 +22,7 @@ public class Rent {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "detail_id")
-    private Details detailRent;
+    private DetailsEntity detailRent;
 
     private LocalDateTime startDate;
     private LocalDateTime endDate;

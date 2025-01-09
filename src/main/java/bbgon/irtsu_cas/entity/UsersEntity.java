@@ -27,7 +27,7 @@ public class UsersEntity {
     private String phone;
 
     @OneToMany(mappedBy = "owner",cascade = CascadeType.ALL)
-    private List<Details> userDetails;
+    private List<DetailsEntity> userDetails;
 
     private LocalDateTime createdAccount;
 }
