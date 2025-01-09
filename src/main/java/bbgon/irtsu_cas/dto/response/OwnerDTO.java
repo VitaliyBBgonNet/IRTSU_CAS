@@ -14,8 +14,8 @@ public class OwnerDTO {
     private String lastName;
     private String surname;
     private String email;
-    private String password;
     private String position;
     private String avtar;
     private String phone;
+    private String department;
 }

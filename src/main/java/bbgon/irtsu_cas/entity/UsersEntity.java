@@ -25,6 +25,7 @@ public class UsersEntity {
     private String position;
     private String avtar;
     private String phone;
+    private String department;
 
     @OneToMany(mappedBy = "owner",cascade = CascadeType.ALL)
     private List<DetailsEntity> userDetails;
