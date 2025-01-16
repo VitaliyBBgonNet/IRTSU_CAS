@@ -14,12 +14,19 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
                          AuthenticationException authException) throws IOException, ServletException {
+
+        var a = request.getRequestURI();
+
+        if (request.getRequestURI().contains("/register")) {
+            response.setStatus(HttpServletResponse.SC_OK);
+            return;
+        }
+
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
-        ObjectMapper mapper = new ObjectMapper();
-        String jsonResponse = "Error";//mapper.writeValueAsString(new BaseSuccessResponse(ErrorCodes.UNAUTHORISED.getCode()));
+        String jsonResponse = "ERROR_UNAUTHORIZED";
         response.getWriter().write(jsonResponse);
     }
 }

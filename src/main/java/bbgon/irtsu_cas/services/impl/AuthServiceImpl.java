@@ -1,6 +1,7 @@
 package bbgon.irtsu_cas.services.impl;
 
 import bbgon.irtsu_cas.CustomException;
+import bbgon.irtsu_cas.constants.ErrorCodes;
 import bbgon.irtsu_cas.dto.request.AuthUserRequest;
 import bbgon.irtsu_cas.dto.request.RegistrationUserRequest;
 import bbgon.irtsu_cas.dto.response.CustomSuccessResponse;
@@ -27,7 +28,7 @@ public class AuthServiceImpl implements AuthService {
     public CustomSuccessResponse<LoginUserResponse> registrationUser(RegistrationUserRequest requestForRegistration) {
 
         authRepository.findByEmail(requestForRegistration.getEmail()).ifPresent(auth -> {
-            throw new CustomException("USER_ALREADY_EXISTS");
+            throw new CustomException(ErrorCodes.USER_ALREADY_EXISTS);
         });
 
         String encryptedPassword = passwordEncoder.encode(requestForRegistration.getPassword());
@@ -55,10 +56,10 @@ public class AuthServiceImpl implements AuthService {
     public CustomSuccessResponse<LoginUserResponse> authorizationUser(AuthUserRequest requestForAuthorization) {
 
         UsersEntity usersEntity = authRepository.findByEmail(requestForAuthorization.getEmail())
-                .orElseThrow(() -> new CustomException("USER_NOT_FOUND"));
+                .orElseThrow(() -> new CustomException(ErrorCodes.USER_NOT_FOUND));
 
         if (!passwordEncoder.matches(requestForAuthorization.getPassword(), usersEntity.getPassword())) {
-            throw new CustomException("USER_PASSWORD_NOT_VALID");
+            throw new CustomException(ErrorCodes.USER_PASSWORD_NOT_VALID);
         }
 
         LoginUserResponse loginUserResponse = new LoginUserResponse();

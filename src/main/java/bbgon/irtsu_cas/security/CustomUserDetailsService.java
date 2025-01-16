@@ -1,5 +1,6 @@
 package bbgon.irtsu_cas.security;
 import bbgon.irtsu_cas.CustomException;
+import bbgon.irtsu_cas.constants.ErrorCodes;
 import bbgon.irtsu_cas.repositories.AuthRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -20,7 +21,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         if (authRepository.existsById(UUID.fromString(username))) {
             return new CustomUserDetails(username);
         } else {
-            throw new CustomException("USER_NOT_FOUND");
+            throw new CustomException(ErrorCodes.USER_NOT_FOUND);
         }
     }
 }

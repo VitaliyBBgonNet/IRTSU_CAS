@@ -1,6 +1,7 @@
 package bbgon.irtsu_cas.services.impl;
 
 import bbgon.irtsu_cas.CustomException;
+import bbgon.irtsu_cas.constants.ErrorCodes;
 import bbgon.irtsu_cas.dto.CustomDoneRegistrationDTO;
 import bbgon.irtsu_cas.dto.UserRegistrationDTO;
 import bbgon.irtsu_cas.entity.UsersEntity;
@@ -35,7 +36,7 @@ public class UserServiceImpl implements UserService {
 
     private UsersEntity getUserOrThrowException(UUID uuid) {
         UsersEntity usersEntity = userRepository.findById(uuid)
-                .orElseThrow(() -> new CustomException("USER_NOT_FOUND"));
+                .orElseThrow(() -> new CustomException(ErrorCodes.USER_NOT_FOUND));
         return usersEntity;
     }
 }

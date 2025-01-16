@@ -1,11 +1,13 @@
 package bbgon.irtsu_cas;
 
-import ch.qos.logback.core.spi.ErrorCodes;
+import bbgon.irtsu_cas.constants.ErrorCodes;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 
 @AllArgsConstructor
 @Getter
-public class CustomException extends RuntimeException{
-    private final String errorCodes;
+@Setter
+public class CustomException extends RuntimeException {
+    private final ErrorCodes errorCodes;
 }
