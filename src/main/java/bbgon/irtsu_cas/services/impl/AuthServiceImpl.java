@@ -13,6 +13,7 @@ import bbgon.irtsu_cas.services.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import java.time.LocalDateTime;
 
 @Component
 @RequiredArgsConstructor
@@ -37,6 +38,10 @@ public class AuthServiceImpl implements AuthService {
         UsersEntity usersEntity = new UsersEntity();
         usersEntity.setEmail(requestForRegistration.getEmail());
         usersEntity.setPassword(encryptedPassword);
+        usersEntity.setCreatedAccount(LocalDateTime.now());
+        usersEntity.setName(requestForRegistration.getName());
+        usersEntity.setLastName(requestForRegistration.getLastName());
+        usersEntity.setSurname(requestForRegistration.getSurname());
 
         authRepository.save(usersEntity);
 
