@@ -26,7 +26,7 @@ public class Filter extends OncePerRequestFilter {
 
         String bearerToken = request.getHeader(StringConstants.AUTHORIZATION);
         if (bearerToken != null && bearerToken.startsWith(StringConstants.BEARER)) {
-            String token = bearerToken.substring(7);
+            String token = bearerToken;
             if (tokenSecurity.isTokenValid(token)) {
                 String id = tokenSecurity.getIdFromToken(token);
                 CustomUserDetails currentUser = customUserDetailsService.loadUserByUsername(id);
