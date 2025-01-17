@@ -47,11 +47,6 @@ public class AuthServiceImpl implements AuthService {
 
         //Потом переделать через маппер
         LoginUserResponse loginUserResponse = new LoginUserResponse();
-        loginUserResponse.setEmail(requestForRegistration.getEmail());
-        loginUserResponse.setFIO(requestForRegistration
-                .getLastName()+requestForRegistration
-                .getName()+requestForRegistration
-                .getSurname());
         loginUserResponse.setToken(jwtToken.generateToken(usersEntity.getId()));
 
         return new CustomSuccessResponse<>(loginUserResponse);
@@ -68,8 +63,6 @@ public class AuthServiceImpl implements AuthService {
         }
 
         LoginUserResponse loginUserResponse = new LoginUserResponse();
-        loginUserResponse.setEmail(requestForAuthorization.getEmail());
-        loginUserResponse.setFIO(usersEntity.getName() +" "+usersEntity.getLastName()+" "+usersEntity.getSurname());
         loginUserResponse.setToken(jwtToken.generateToken(usersEntity.getId()));
         return new CustomSuccessResponse<>(loginUserResponse);
     }
