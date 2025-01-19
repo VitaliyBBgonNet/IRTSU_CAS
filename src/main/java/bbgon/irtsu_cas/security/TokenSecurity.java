@@ -25,7 +25,7 @@ public class TokenSecurity {
         byte[] keyBytes = Base64.getDecoder().decode(secretKey);
         SecretKey key = new SecretKeySpec(keyBytes, SignatureAlgorithm.HS512.getJcaName());
 
-        return Jwts.builder()
+        return StringConstants.BEARER + Jwts.builder()
                 .setSubject(id.toString())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
