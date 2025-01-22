@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -23,11 +24,14 @@ public class UsersEntity {
     private String email;
     private String password;
     private String position;
-    private String avtar;
+    private String avatar;
     private String phone;
     private String department;
 
-    @OneToMany(mappedBy = "owner",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "admin", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<GroupEntity> ownGroups;
+
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DetailsEntity> userDetails;
 
     private LocalDateTime createdAccount;
