@@ -1,5 +1,7 @@
 package bbgon.irtsu_cas.services.impl;
 
+import bbgon.irtsu_cas.CustomException;
+import bbgon.irtsu_cas.constants.ErrorCodes;
 import bbgon.irtsu_cas.dto.request.NewGroupRequest;
 import bbgon.irtsu_cas.dto.response.CustomSuccessResponse;
 import bbgon.irtsu_cas.dto.response.SuccessResponse;
@@ -23,14 +25,14 @@ public class AdminServiceImpl implements AdminService {
 
     private final UserService userService;
 
-    private final UserRepository userRepository;
-
     @Override
     public CustomSuccessResponse<SuccessResponse> createNewGroup(NewGroupRequest newGroupRequest) {
 
         UsersEntity thisUser = userService.findUserEntityById(userService.getUserIdByToken());
 
-
+        groupRepository.findByName(newGroupRequest.getGroupName()).ifPresent(group -> {
+            throw new CustomException(ErrorCodes.USER_ALREADY_EXISTS); // исправить на другую кастомную ошибку
+        });
 
         GroupEntity groupEntity = new GroupEntity();
         groupEntity.setName(newGroupRequest.getGroupName());
