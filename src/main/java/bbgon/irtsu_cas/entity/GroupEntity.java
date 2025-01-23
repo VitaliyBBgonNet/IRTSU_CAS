@@ -21,6 +21,9 @@ public class GroupEntity {
 
     private String logo;
 
+    @OneToMany(mappedBy = "group", cascade = CascadeType.ALL)
+    private Set<DetailsEntity> details;
+
     // Связь многие ко многим с пользователями
     @ManyToMany
     @JoinTable(

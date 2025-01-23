@@ -6,8 +6,10 @@ import bbgon.irtsu_cas.dto.request.GroupEditDataRequest;
 import bbgon.irtsu_cas.dto.request.NewGroupRequest;
 import bbgon.irtsu_cas.dto.response.CustomSuccessResponse;
 import bbgon.irtsu_cas.dto.response.SuccessResponse;
+import bbgon.irtsu_cas.entity.DetailsEntity;
 import bbgon.irtsu_cas.entity.GroupEntity;
 import bbgon.irtsu_cas.entity.UsersEntity;
+import bbgon.irtsu_cas.repositories.DetailsRepository;
 import bbgon.irtsu_cas.repositories.GroupRepository;
 import bbgon.irtsu_cas.repositories.UserRepository;
 import bbgon.irtsu_cas.services.AdminService;
@@ -17,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -25,6 +28,8 @@ import java.util.UUID;
 public class AdminServiceImpl implements AdminService {
 
     private final GroupRepository groupRepository;
+
+    private final DetailsRepository detailsRepository;
 
     private final UserService userService;
 
@@ -96,6 +101,31 @@ public class AdminServiceImpl implements AdminService {
         groupRepository.save(groupEntity);
 
         return new CustomSuccessResponse<>(new SuccessResponse("Edit group successfully"));
+    }
+
+    @Override
+    public CustomSuccessResponse<SuccessResponse> addDetailsInOwnGroup(UUID groupId, UUID detailId) {
+        UUID currentUserId = userService.getUserIdByToken();
+
+
+        GroupEntity groupEntity = findGroupByUUID(groupId);
+        if (!groupEntity.getAdmin().getId().equals(currentUserId)) {
+            throw new CustomException(ErrorCodes.ACCESS_DENIED); // Убедитесь, что ошибка корректная
+        }
+
+
+        DetailsEntity detailsEntity = detailsRepository.findById(detailId)
+                .orElseThrow(() -> new CustomException(ErrorCodes.DETAIL_NOT_FOUND));
+
+        if (!detailsEntity.getOwner().getId().equals(currentUserId)) {
+            throw new CustomException(ErrorCodes.ACCESS_DENIED);
+        }
+
+        // Добавить деталь в группу и сохранить изменения
+        detailsEntity.setGroup(groupEntity);
+        detailsRepository.save(detailsEntity);
+
+        return new CustomSuccessResponse<>(new SuccessResponse("Details added successfully"));
     }
 
 

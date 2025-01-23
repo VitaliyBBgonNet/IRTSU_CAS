@@ -13,4 +13,6 @@ public interface AdminService {
     CustomSuccessResponse<SuccessResponse> deleteGroup(UUID groupId, String groupName);
 
     CustomSuccessResponse<SuccessResponse> editGroupProperties(UUID groupId, GroupEditDataRequest groupEditDataRequest);
+
+    CustomSuccessResponse<SuccessResponse> addDetailsInOwnGroup(UUID groupId, UUID detailId);
 }

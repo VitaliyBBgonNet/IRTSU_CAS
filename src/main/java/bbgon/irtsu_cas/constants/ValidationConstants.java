@@ -50,4 +50,5 @@ public interface ValidationConstants {
     String ACCESS_DENIED = "no access for specific user";
     String FAILED_UPLOAD_FILE = "File upload failed: ";
     String GROUP_NAME_ALREADY_TAKEN = "Group name already taken";
+    String DETAIL_NOT_FOUND = "Detail not found";
 }

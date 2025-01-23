@@ -24,6 +24,10 @@ public class DetailsEntity {
     private String documentation;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "grpup_id")
+    private GroupEntity group;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id")
     private UsersEntity owner;
 

@@ -56,7 +56,8 @@ public enum ErrorCodes {
     HTTP_MESSAGE_NOT_READABLE_EXCEPTION(47, ValidationConstants.HTTP_MESSAGE_NOT_READABLE_EXCEPTION),
     ACCESS_DENIED(48, ValidationConstants.ACCESS_DENIED),
     FAILED_UPLOAD_FILE(50, ValidationConstants.FAILED_UPLOAD_FILE),
-    GROUP_NAME_ALREADY_TAKEN(51,ValidationConstants.GROUP_NAME_ALREADY_TAKEN);
+    GROUP_NAME_ALREADY_TAKEN(51,ValidationConstants.GROUP_NAME_ALREADY_TAKEN),
+    DETAIL_NOT_FOUND(52, ValidationConstants.DETAIL_NOT_FOUND);
 
 
     private static final Map<String, ErrorCodes> ERROR_CODE_MAP = new HashMap<>();

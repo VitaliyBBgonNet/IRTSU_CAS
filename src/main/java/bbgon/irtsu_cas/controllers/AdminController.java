@@ -39,4 +39,11 @@ public class AdminController {
         return ResponseEntity.ok(adminService.editGroupProperties(uuid, groupEditDataRequest));
     }
 
+    @PostMapping("/addDetailInGroup")
+    public ResponseEntity<CustomSuccessResponse<SuccessResponse>> addDetailInGroup(
+            @RequestParam UUID uuidGroup,
+            @RequestParam UUID uuidDetail) {
+        return ResponseEntity.ok(adminService.addDetailsInOwnGroup(uuidGroup, uuidDetail));
+    }
+
 }
