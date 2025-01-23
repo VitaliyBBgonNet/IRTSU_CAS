@@ -49,4 +49,5 @@ public interface ValidationConstants {
     String USER_ROLE_NOT_NULL = "user role mustn't be null";
     String ACCESS_DENIED = "no access for specific user";
     String FAILED_UPLOAD_FILE = "File upload failed: ";
+    String GROUP_NAME_ALREADY_TAKEN = "Group name already taken";
 }

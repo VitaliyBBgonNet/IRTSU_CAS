@@ -36,7 +36,7 @@ public enum ErrorCodes {
     USER_AVATAR_NOT_NULL(24, "User avatar mustn't be null"),
     PASSWORD_NOT_VALID(25, "Password is not valid"),
     PASSWORD_NOT_NULL(26, "user password mustn't be null"),
-    NEWS_NOT_FOUND(27, "news not found"),
+    NEWS_NOT_FOUND(27, "news not found"),//Запись не найденна
     ID_MUST_BE_POSITIVE(29, ValidationConstants.ID_MUST_BE_POSITIVE),
     USER_ALREADY_EXISTS(30, "User already exists"),
     TODO_TEXT_NOT_NULL(31, ValidationConstants.TODO_TEXT_NOT_NULL),
@@ -55,7 +55,9 @@ public enum ErrorCodes {
     USER_WITH_THIS_EMAIL_ALREADY_EXIST(46, ValidationConstants.USER_WITH_THIS_EMAIL_ALREADY_EXIST),
     HTTP_MESSAGE_NOT_READABLE_EXCEPTION(47, ValidationConstants.HTTP_MESSAGE_NOT_READABLE_EXCEPTION),
     ACCESS_DENIED(48, ValidationConstants.ACCESS_DENIED),
-    FAILED_UPLOAD_FILE(50, ValidationConstants.FAILED_UPLOAD_FILE);
+    FAILED_UPLOAD_FILE(50, ValidationConstants.FAILED_UPLOAD_FILE),
+    GROUP_NAME_ALREADY_TAKEN(51,ValidationConstants.GROUP_NAME_ALREADY_TAKEN);
+
 
     private static final Map<String, ErrorCodes> ERROR_CODE_MAP = new HashMap<>();
 

@@ -19,6 +19,8 @@ public class GroupEntity {
     private String name;
     private String description;
 
+    private String logo;
+
     // Связь многие ко многим с пользователями
     @ManyToMany
     @JoinTable(
