@@ -70,6 +70,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Transactional
     public CustomSuccessResponse<SuccessResponse> editGroupProperties(UUID groupId, GroupEditDataRequest groupEditDataRequest) {
         //Проверим есть ли группа которую мы хотим изменить и достаём её
         //Проверим право на группу
@@ -104,6 +105,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Transactional
     public CustomSuccessResponse<SuccessResponse> addDetailsInOwnGroup(UUID groupId, UUID detailId) {
         UUID currentUserId = userService.getUserIdByToken();
 
@@ -128,6 +130,42 @@ public class AdminServiceImpl implements AdminService {
         return new CustomSuccessResponse<>(new SuccessResponse("Details added successfully"));
     }
 
+    @Override
+    @Transactional
+    public CustomSuccessResponse<SuccessResponse> addUserInGroup(UUID uuidUser , UUID uuidGroup){
+
+        GroupEntity groupEntity = findGroupByUUID(uuidGroup);
+        UsersEntity thisUser = userService.findUserEntityById(uuidUser);
+
+        if(!groupEntity.getAdmin().getId().equals(userService.getUserIdByToken())){
+            throw new CustomException(ErrorCodes.ACCESS_DENIED);//Перепроверить ошибку
+        }
+
+        groupEntity.getUsers().add(thisUser);
+
+        groupRepository.save(groupEntity);
+
+        return new CustomSuccessResponse<>(new SuccessResponse("User added successfully"));
+    }
+
+    @Override
+    @Transactional
+    public CustomSuccessResponse<SuccessResponse> deleteUserFromOwnGroup(UUID uuidUser , UUID uuidGroup){
+
+        GroupEntity groupEntity = findGroupByUUID(uuidGroup);
+
+        UsersEntity thisUser = userService.findUserEntityById(uuidUser);
+
+        if(!groupEntity.getAdmin().getId().equals(userService.getUserIdByToken())){
+            throw new CustomException(ErrorCodes.ACCESS_DENIED);//Перепроверить ошибку
+        }
+
+        groupEntity.getUsers().remove(thisUser);
+
+        groupRepository.save(groupEntity);
+
+        return new CustomSuccessResponse<>(new SuccessResponse("User deleted successfully"));
+    }
 
     private GroupEntity findGroupByUUID(UUID uuid) {
         return groupRepository.findById(uuid)

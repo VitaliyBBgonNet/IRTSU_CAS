@@ -46,4 +46,17 @@ public class AdminController {
         return ResponseEntity.ok(adminService.addDetailsInOwnGroup(uuidGroup, uuidDetail));
     }
 
+    @PostMapping("/addUserInOwnGroup")
+    public ResponseEntity<CustomSuccessResponse<SuccessResponse>> addUserInOwnGroup(
+            @RequestParam UUID uuidUser,
+            @RequestParam UUID uuidGroup) {
+        return ResponseEntity.ok(adminService.addUserInGroup(uuidUser, uuidGroup));
+    }
+
+    @PostMapping("/deleteUserFromOwnGroup")
+    public ResponseEntity<CustomSuccessResponse<SuccessResponse>> deleteUserFromOwnGroup(
+            @RequestParam UUID uuidUser,
+            @RequestParam UUID uuidGroup) {
+        return ResponseEntity.ok(adminService.deleteUserFromOwnGroup(uuidUser, uuidGroup));
+    }
 }
