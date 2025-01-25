@@ -59,4 +59,11 @@ public class AdminController {
             @RequestParam UUID uuidGroup) {
         return ResponseEntity.ok(adminService.deleteUserFromOwnGroup(uuidUser, uuidGroup));
     }
+
+    @PostMapping("/deleteDetailFromOwnGroup")
+    public ResponseEntity<CustomSuccessResponse<SuccessResponse>> deleteDetailFromOwnGroup(
+            @RequestParam UUID uuidDetail,
+            @RequestParam UUID uuidGroup) {
+        return ResponseEntity.ok(adminService.deleteDetailFromOwnGroup(uuidDetail, uuidGroup));
+    }
 }

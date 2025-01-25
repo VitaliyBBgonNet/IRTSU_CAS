@@ -19,4 +19,6 @@ public interface AdminService {
     CustomSuccessResponse<SuccessResponse> addUserInGroup(UUID uuidUser , UUID uuidGroup);
 
     CustomSuccessResponse<SuccessResponse> deleteUserFromOwnGroup(UUID uuidUser , UUID uuidGroup);
+
+    CustomSuccessResponse<SuccessResponse> deleteDetailFromOwnGroup(UUID uuidDetail, UUID uuidGroup);
 }

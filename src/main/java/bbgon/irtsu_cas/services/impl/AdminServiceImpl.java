@@ -46,6 +46,9 @@ public class AdminServiceImpl implements AdminService {
         groupEntity.setName(newGroupRequest.getGroupName());
         groupEntity.setDescription(newGroupRequest.getDescription());
         groupEntity.setAdmin(thisUser);
+        Set<UsersEntity> firstUser = new HashSet<>();
+        firstUser.add(thisUser);
+        groupEntity.setUsers(firstUser);
 
         groupRepository.save(groupEntity);
 
@@ -109,12 +112,11 @@ public class AdminServiceImpl implements AdminService {
     public CustomSuccessResponse<SuccessResponse> addDetailsInOwnGroup(UUID groupId, UUID detailId) {
         UUID currentUserId = userService.getUserIdByToken();
 
-
         GroupEntity groupEntity = findGroupByUUID(groupId);
         if (!groupEntity.getAdmin().getId().equals(currentUserId)) {
-            throw new CustomException(ErrorCodes.ACCESS_DENIED); // Убедитесь, что ошибка корректная
+            throw new CustomException(ErrorCodes.ACCESS_DENIED);// Поменять логику. Деталь в группу может добавить
+                                                                // любой пользователь состоящий в данной группе.
         }
-
 
         DetailsEntity detailsEntity = detailsRepository.findById(detailId)
                 .orElseThrow(() -> new CustomException(ErrorCodes.DETAIL_NOT_FOUND));
@@ -146,6 +148,38 @@ public class AdminServiceImpl implements AdminService {
         groupRepository.save(groupEntity);
 
         return new CustomSuccessResponse<>(new SuccessResponse("User added successfully"));
+    }
+
+    public CustomSuccessResponse<SuccessResponse> deleteDetailFromOwnGroup(UUID uuidDetail, UUID uuidGroup) {
+
+        GroupEntity groupEntity = findGroupByUUID(uuidGroup);
+
+        DetailsEntity detailEntity = detailsRepository.findById(uuidDetail)
+                .orElseThrow(() -> new CustomException(ErrorCodes.DETAIL_NOT_FOUND));
+
+        UUID currentUserId = userService.getUserIdByToken();
+
+        // Проверка: является ли пользователь владельцем детали или администратором группы
+        boolean isOwner = detailEntity.getOwner().getId().equals(currentUserId);
+        boolean isAdmin = groupEntity.getAdmin().getId().equals(currentUserId);
+
+        if (!isOwner && !isAdmin) {
+            throw new CustomException(ErrorCodes.ACCESS_DENIED);
+        }
+
+        // Проверка: является ли пользователь членом группы (администратор уже проверен)
+        boolean isUserInGroup = groupEntity.getUsers().stream()
+                .anyMatch(user -> user.getId().equals(currentUserId));
+
+        if (!isUserInGroup) {
+            throw new CustomException(ErrorCodes.ACCESS_DENIED);
+        }
+
+        // Удаление связи между деталью и группой
+        detailEntity.setGroup(null);
+        detailsRepository.save(detailEntity);
+
+        return new CustomSuccessResponse<>(new SuccessResponse("Details deleted successfully"));
     }
 
     @Override

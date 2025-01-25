@@ -10,7 +10,7 @@ import java.util.UUID;
 @Entity
 @Getter
 @Setter
-public class Rent {
+public class RentEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
