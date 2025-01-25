@@ -10,4 +10,6 @@ public interface StringConstants {
     String ANY_USER = "Any user";
 
     String ERROR_HEAD = "errorHead";
+
+    String RENTED = "RENTED";
 }

@@ -51,4 +51,5 @@ public interface ValidationConstants {
     String FAILED_UPLOAD_FILE = "File upload failed: ";
     String GROUP_NAME_ALREADY_TAKEN = "Group name already taken";
     String DETAIL_NOT_FOUND = "Detail not found";
+    String DETAIL_RENTED_EARLIER = "Detail rented earlier";
 }
