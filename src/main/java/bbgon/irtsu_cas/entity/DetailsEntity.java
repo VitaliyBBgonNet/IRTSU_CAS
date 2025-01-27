@@ -24,15 +24,19 @@ public class DetailsEntity {
     private String documentation;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "grpup_id")
+    @JoinColumn(name = "group_id")
     private GroupEntity group;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "owner_id")
     private UsersEntity owner;
 
     private String status;
 
     private LocalDateTime createdDetail;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name =  "rent_id")
+    private RentEntity rent;
 }
 

@@ -5,13 +5,19 @@ import bbgon.irtsu_cas.dto.response.CustomSuccessResponse;
 import bbgon.irtsu_cas.dto.response.DetailResponse;
 import bbgon.irtsu_cas.dto.response.OwnerDTO;
 import bbgon.irtsu_cas.dto.response.PageableResponse;
-import bbgon.irtsu_cas.entity.DetailsEntity;
+import bbgon.irtsu_cas.entity.*;
+import bbgon.irtsu_cas.mappers.DetailMapper;
 import bbgon.irtsu_cas.repositories.DetailsRepository;
 import bbgon.irtsu_cas.services.DetailsService;
 import bbgon.irtsu_cas.services.UserService;
+import bbgon.irtsu_cas.util.QPredicates;
+import com.querydsl.core.types.Predicate;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -26,6 +32,11 @@ public class DetailsServiceImpl implements DetailsService {
 
     private final UserService userService;
 
+    private final DetailMapper detailMapper;
+
+    @PersistenceContext
+    private final EntityManager entityManager;
+
     @Override
     public CustomSuccessResponse<String> createDetail(DetailProperties detailProperties) {
         DetailsEntity detailsEntity = new DetailsEntity();
@@ -36,6 +47,7 @@ public class DetailsServiceImpl implements DetailsService {
         detailsEntity.setDocumentation(detailProperties.getDocumentation());
         detailsEntity.setStatus(detailProperties.getStatus());
         detailsEntity.setImage(detailProperties.getImage());
+        detailsEntity.setRent(null);
         detailsRepository.save(detailsEntity);
         return new CustomSuccessResponse<>("DETAIL ADD");
     }
@@ -55,6 +67,47 @@ public class DetailsServiceImpl implements DetailsService {
         return new CustomSuccessResponse<>("DETAIL DELETE");
     }
 
+    @Override
+    public CustomSuccessResponse<PageableResponse<List<DetailResponse>>> getDetailWitchPaginationAndPredicateFilter(
+            Integer page, Integer perPage,
+            String detailName,
+            String status,
+            UUID ownerId,
+            UUID orderHumanId,
+            UUID groupId,
+            LocalDateTime dataAdd) {
+
+        QDetailsEntity detailsEntity = QDetailsEntity.detailsEntity;
+
+        Pageable pageable = PageRequest.of(page, perPage);
+
+        Predicate predicate = QPredicates.builder()
+                .add(detailName , detailsEntity.name::containsIgnoreCase)
+                .add(status, detailsEntity.status::containsIgnoreCase)
+                .add(ownerId, detailsEntity.owner.id::eq)
+                .add(orderHumanId, detailsEntity.rent.id::eq)
+                .add(groupId, detailsEntity.group.id::eq)
+                .add(dataAdd, detailsEntity.createdDetail::eq)
+                .buildAnd();
+
+        Page<DetailsEntity> result =  detailsRepository.findAll(predicate, pageable);
+
+        List<DetailResponse> detailResponseList = result.getContent().stream()
+                        .map(entity -> {
+                            DetailResponse detailResponse = new DetailResponse();
+                            detailResponse = detailMapper.toResponse(entity);
+                            return detailResponse;
+                        }).toList();
+
+        System.out.println(result.iterator().hasNext());
+
+        PageableResponse<List<DetailResponse>> pageableResponse = new PageableResponse<>(
+                detailResponseList, result.getTotalElements()
+        );
+
+        System.out.println();
+        return new CustomSuccessResponse<>(pageableResponse);
+    }
 
     public List<DetailResponse> mapDetails(Page<DetailsEntity> detailsEntityPage) {
 

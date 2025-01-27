@@ -2,6 +2,7 @@ package bbgon.irtsu_cas.controllers;
 
 import bbgon.irtsu_cas.constants.ValidationConstants;
 import bbgon.irtsu_cas.dto.request.DetailProperties;
+import bbgon.irtsu_cas.dto.request.FilterDetailRequest;
 import bbgon.irtsu_cas.dto.response.CustomSuccessResponse;
 import bbgon.irtsu_cas.dto.response.DetailResponse;
 import bbgon.irtsu_cas.dto.response.PageableResponse;
@@ -11,10 +12,12 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 
@@ -70,4 +73,31 @@ public class DetailsController {
             @RequestBody List<UUID> uuidList){
         return ResponseEntity.ok(detailsService.deleteListDetails(uuidList));
     }
+
+    @GetMapping("/getDetailWitchFilter")
+    public ResponseEntity<CustomSuccessResponse<PageableResponse<List<DetailResponse>>>> getDetails(
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "10") Integer perPage,
+            @RequestParam(required = false) String detailName,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) UUID ownerId,
+            @RequestParam(required = false) UUID orderHumanId,
+            @RequestParam(required = false) UUID groupId,
+            @RequestParam(required = false) String dataAdd
+    ) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS");
+        LocalDateTime data = LocalDateTime.parse(dataAdd, formatter); //нужно исправить тут может выскочить nullPointerException
+
+               CustomSuccessResponse<PageableResponse<List<DetailResponse>>> response =
+                detailsService.getDetailWitchPaginationAndPredicateFilter(page, perPage,
+                        detailName,
+                        status,
+                        ownerId,
+                        orderHumanId,
+                        groupId,
+                        data );
+
+        return ResponseEntity.ok(response);
+    }
+
 }

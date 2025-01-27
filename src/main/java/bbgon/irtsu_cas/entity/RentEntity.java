@@ -20,7 +20,7 @@ public class RentEntity {
     @JoinColumn(name = "user_id")
     private UsersEntity userRent;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "detail_id")
     private DetailsEntity detailRent;
 
@@ -28,4 +28,5 @@ public class RentEntity {
     private LocalDateTime endDate;
 
     private String rentalStatus;
+
 }
