@@ -24,5 +24,5 @@ public interface DetailsService {
             UUID ownerId,
             UUID orderHumanId,
             UUID groupId,
-            LocalDateTime dataAdd);
+            String dataAdd);
 }

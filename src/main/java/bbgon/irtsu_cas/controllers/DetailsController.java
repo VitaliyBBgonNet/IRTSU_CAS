@@ -85,8 +85,6 @@ public class DetailsController {
             @RequestParam(required = false) UUID groupId,
             @RequestParam(required = false) String dataAdd
     ) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS");
-        LocalDateTime data = LocalDateTime.parse(dataAdd, formatter); //нужно исправить тут может выскочить nullPointerException
 
                CustomSuccessResponse<PageableResponse<List<DetailResponse>>> response =
                 detailsService.getDetailWitchPaginationAndPredicateFilter(page, perPage,
@@ -95,7 +93,7 @@ public class DetailsController {
                         ownerId,
                         orderHumanId,
                         groupId,
-                        data );
+                        dataAdd );
 
         return ResponseEntity.ok(response);
     }

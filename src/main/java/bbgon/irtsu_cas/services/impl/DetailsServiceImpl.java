@@ -21,6 +21,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.UUID;
 
@@ -75,7 +77,17 @@ public class DetailsServiceImpl implements DetailsService {
             UUID ownerId,
             UUID orderHumanId,
             UUID groupId,
-            LocalDateTime dataAdd) {
+            String data) {
+
+        LocalDateTime dataAdd = null;
+        if (data != null && !data.isEmpty()) {
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSSSSS");
+                dataAdd = LocalDateTime.parse(data, formatter);
+            } catch (DateTimeParseException e) {// Потом как нибудь корректно обработать
+                System.out.println("Ошибка при разборе даты: " + e.getMessage());
+            }
+        }
 
         QDetailsEntity detailsEntity = QDetailsEntity.detailsEntity;
 
