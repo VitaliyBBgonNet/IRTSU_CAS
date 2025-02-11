@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link rel="stylesheet" th:href="@{/css/login.css}" type="text/css">
+    <script src="https://unpkg.com/htmx.org@1.9.5"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
+</head>
+<body>
+<div class="login-container">
+    <div class="login-box">
+        <div class="login-title">IRTSU CAS</div>
+        <form class="login-form"
+              hx-post="/auth/login"
+              hx-trigger="submit"
+              hx-target="body"
+              hx-swap="none"
+              hx-headers='{"Content-Type": "application/json"}'
+              hx-ext="json-enc">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input
+                        id="email"
+                        name="email"
+                        type="email"
+                        class="form-input"
+                        placeholder="Введите email"
+                        required
+                />
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input
+                        id="password"
+                        name="password"
+                        type="password"
+                        class="form-input"
+                        placeholder="Введите пароль"
+                        required
+                />
+            </div>
+            <button type="submit" class="login-button">Войти</button>
+        </form>
+    </div>
+</div>
+
+<!-- Секция для обработки ответа сервера (токен) -->
+<div id="response"></div>
+
+<script>
+    document.body.addEventListener('htmx:afterRequest', function(event) {
+        if (event.detail.xhr.status === 200) {
+            try {
+                let response = JSON.parse(event.detail.xhr.responseText);
+                if (response.success) {
+                    // Сохраняем токен в localStorage
+                    localStorage.setItem('token', response.data.token);
+                    document.getElementById("response").innerHTML = "<div style='color: green;'>Авторизация успешна</div>";
+                    console.log("Токен сохранен:", response.data.token);
+                } else {
+                    document.getElementById("response").innerHTML = "<div style='color: red;'>Ошибка авторизации</div>";
+                }
+            } catch (e) {
+                document.getElementById("response").innerHTML = "<div style='color: red;'>Ошибка обработки ответа</div>";
+            }
+        } else {
+            document.getElementById("response").innerHTML = "<div style='color: red;'>Ошибка сервера</div>";
+        }
+    });
+</script>
+</body>
+</html>

@@ -29,6 +29,9 @@ public class SecurityConfig {
                         .requestMatchers("/details/all").permitAll()
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/auth/register").permitAll()
+                        .requestMatchers("/properties/getAll").permitAll()
+                        .requestMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
+
                         .anyRequest().authenticated()
                 ).exceptionHandling(exception -> exception
                         .authenticationEntryPoint(customAuthenticationEntryPoint)

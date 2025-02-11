@@ -1,0 +1,103 @@
+/* Центрирование контейнера */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f8f9fa;
+  margin: 0;
+}
+
+.form-input.error {
+  border: 1px solid rgba(228, 130, 130, 0.7); /* Толстая красная рамка */
+  background-color: #ffe6e6; /* Светло-красный фон */
+  box-shadow: 0 0 2px red; /* Подсветка красным */
+}
+
+/* Основной блок формы */
+.login-box {
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  width: 350px;
+  text-align: center;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Заголовок */
+.login-title {
+  font: 700 24px/1.5 "Roboto Light", "Arial Black";
+  background-color: #5c9eff; /* Синий фон */
+  color: white; /* Белый текст */
+  font-size: 24px; /* Размер шрифта */
+  font-weight: bold; /* Жирный текст */
+  text-align: center; /* Центровка текста */
+  padding: 10px 20px; /* Внутренние отступы */
+  border-radius: 45px; /* Закругленные углы */
+  margin-bottom: 20px; /* Отступ снизу */
+  margin-left: 20%;
+  margin-right: 20%;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Легкая тень */
+}
+
+/* Формы */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Группы ввода */
+.form-group {
+  margin-left: 15%;
+  margin-right: 18%;
+  text-align: left;
+}
+
+/* Метки */
+label {
+  font: 700 14px/1.5 "Roboto Light", "Arial Black";
+  color: #333;
+  margin-bottom: 5px;
+  display: block;
+}
+
+/* Поля ввода */
+.form-input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  background-color: #f5f5f5;
+  font-size: 14px;
+  box-shadow: inset 0px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Стилизация кнопки */
+.login-button {
+  font: 700 24px/1.5 "Roboto Light", "Arial Black";
+  padding: 15px 20px;
+  border: none;
+  border-radius: 12px;
+  background-color: #4a90e2;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.2);
+  margin-top: 35px;
+  margin-right: 25%;
+  margin-left: 25%;
+}
+
+.login-button:disabled {
+  background-color: #a0c3f2;
+  cursor: not-allowed;
+}
+
+.login-button:hover:not(:disabled) {
+  background-color: #357ab8;
+}

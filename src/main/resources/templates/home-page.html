@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Home Page</title>
+  <link rel="stylesheet" th:href="@{/css/home-styles.css}">
+</head>
+
+<div class="components-container">
+  <div class="header">
+    <h1 class="logo">I Have</h1>
+    <nav class="nav">
+      <a class="nav-link" href="#">Components</a>
+      <a class="nav-link" href="#">Order</a>
+    </nav>
+    <div class="user-info">
+      <button class="notification-btn">
+        <img src="notification-icon.png" alt="Notifications"/>
+      </button>
+      <div class="user-profile">
+        <img src="user-avatar.png" alt="User Avatar"/>
+        <span>Any User</span>
+      </div>
+    </div>
+  </div>
+  <main class="main-content">
+    <div class="up-block">
+      <div class="component-text">Components</div>
+      <button class="add-component-btn">+ Add Component</button>
+    </div>
+    <div class="filters">
+      <input type="text" placeholder="Search components..."/>
+      <select *ngIf="properties">
+        <option *ngFor="let status of properties.status" [value]="status">{{ status }}</option>
+      </select>
+      <select>
+        <option>Owner</option>
+      </select>
+      <select *ngIf="properties">
+        <option *ngFor="let orderStatus of properties.status" [value]="orderStatus">{{ orderStatus }}</option>
+      </select>
+      <select *ngIf="properties">
+        <option *ngFor="let group of properties.group" [value]="group">{{ group }}</option>
+      </select>
+      <input type="date" value="2025-01-01"/>
+    </div>
+
+    <table class="components-table">
+      <thead>
+      <tr>
+        <th>Name</th>
+        <th>Status</th>
+        <th>Owner</th>
+        <th>Order</th>
+        <th>Group</th>
+        <th>Description</th>
+        <th>Documentation</th>
+        <th>Data Add</th>
+        <th>Action</th>
+      </tr>
+      </thead>
+      <tbody>
+
+      <tr *ngFor="let item of dataDetails?.data?.content">
+        <td class="td-name">{{ item.name }}</td>
+        <td class="td-status">{{ item.status }}</td>
+        <td class="td-owner">{{ item.owner?.name }} {{ item.owner?.lastName }}</td>
+        <td class="td-order">{{ '' }}</td>
+        <td class="td-group">{{ '' }}</td>
+        <td class="td-description">{{ item.description }}</td>
+        <td class="td-documentation">{{ item.documentation }}</td>
+        <td class="td-data-add">{{ item.createdDetail }}</td>
+        <td class="td-Action"></td>
+      </tr>
+
+      </tbody>
+    </table>
+
+    <div class="pagination">
+      <button>Previous</button>
+      <button>1</button>
+      <button>2</button>
+      <button>Next</button>
+    </div>
+  </main>
+</div>
+
+<pre>
+
+</pre>
+</html>

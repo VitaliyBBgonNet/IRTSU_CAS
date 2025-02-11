@@ -1,0 +1,172 @@
+/* General Styles */
+.body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f9f9;
+}
+
+.components-container {
+    max-width: 98%;
+    margin: 0 auto;
+    padding: 2px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.header {
+    margin-bottom: 0;
+}
+.main-content {
+    margin: 0;
+    padding: 0;
+}
+
+/* Header */
+.header {
+    background: #FFFFFF;
+    display: flex;
+    align-items: baseline;
+    padding: 10px 20px;
+    border-bottom: 1px solid #ddd;
+}
+
+.logo {
+    white-space: nowrap;
+    font: 700 24px/1.5 "Bahnschrift", "Istok Web";
+    color: #4F46E5;
+}
+
+.nav {
+    font: 700 18px/1.5 "Bahnschrift", "Istok Web";
+    padding-left : 5%;
+    display: flex;
+    gap: 20px;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: #333;
+}
+
+.user-info {
+    margin-left: auto; /* Автоматическое выравнивание вправо */
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.notification-btn img,
+.user-profile img {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+}
+
+/* Filters */
+.filters {
+    height: 50px;
+    justify-content: space-between;
+    display: flex;
+    gap: 10px;
+    margin: 35px 0;
+}
+
+.filters input,
+.filters select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.up-block {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-end;
+    height: 50px;
+}
+
+.component-text {
+    padding-top: 0;
+    text-align: center;
+}
+
+.main-content{
+
+    background: #F9FAFB;
+    padding: 35px 15px 15px 15px;
+}
+
+.add-component-btn {
+    font-size: 20px;
+    margin-top: 25px;
+    /*display: block;*/
+    /*margin-left: auto;*/
+    height: 50px;
+    width: 223px;
+    background-color: #5c67f2;
+    color: #fff;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* Table */
+.components-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.components-table th,
+.components-table td {
+    padding: 10px;
+    text-align: left;
+
+}
+
+.components-table .name a {
+    color: #5c67f2;
+    text-decoration: none;
+}
+
+.status {
+    padding: 5px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+}
+
+.status.active {
+    background-color: #d4f4dd;
+    color: #2b8a3e;
+}
+
+.status.draft {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.owner img {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    margin-right: 5px;
+}
+
+/* Pagination */
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.pagination button {
+    padding: 5px 10px;
+    border: 1px solid #ddd;
+    background: #fff;
+    cursor: pointer;
+}
