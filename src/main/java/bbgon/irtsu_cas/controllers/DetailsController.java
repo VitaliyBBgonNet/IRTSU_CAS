@@ -48,6 +48,7 @@ public class DetailsController {
         return ResponseEntity.ok(detailsService.getDetailsPagination(page, perPage));
     }
 
+    @GetMapping("/filter")
     public ResponseEntity<CustomSuccessResponse<PageableResponse<List<DetailResponse>>>> getDetailsByFilterAndPagination(
             @RequestParam(value = "page", defaultValue = "1")
             @Min(value = 1, message = ValidationConstants.PER_PAGE_MIN_NOT_VALID)
@@ -58,13 +59,13 @@ public class DetailsController {
             @Positive(message = ValidationConstants.TASKS_PER_PAGE_GREATER_OR_EQUAL_1)
             @Max(value = 100, message = ValidationConstants.TASKS_PER_PAGE_LESS_OR_EQUAL_100) Integer perPage,
 
-            @RequestParam(value = "name") String name,
-            @RequestParam(value = "status") String status,
-            @RequestParam(value = "ownerName") String ownerName,
-            @RequestParam(value = "lastName") String lastName,
-            @RequestParam(value = "surName") String surName,
-            @RequestParam(value = "UUID") UUID ownerID,
-            @RequestParam(value = "created") LocalDateTime created){
+            @RequestParam(value = "name", required = false) String name,
+            @RequestParam(value = "status",required = false) String status,
+            @RequestParam(value = "ownerName",required = false) String ownerName,
+            @RequestParam(value = "lastName",required = false) String lastName,
+            @RequestParam(value = "surName",required = false) String surName,
+            @RequestParam(value = "UUID",required = false) UUID ownerID,
+            @RequestParam(value = "created",required = false) LocalDateTime created){
         return ResponseEntity.ok(detailsService.getDetailsPagination(page, perPage));
     }
 
