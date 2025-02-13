@@ -1,4 +1,4 @@
-package bbgon.irtsu_cas.controllers;
+package bbgon.irtsu_cas.controllers.restControllers;
 
 import bbgon.irtsu_cas.dto.response.CustomSuccessResponse;
 import bbgon.irtsu_cas.dto.response.SuccessResponse;

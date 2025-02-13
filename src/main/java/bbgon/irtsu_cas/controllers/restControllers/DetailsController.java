@@ -1,8 +1,7 @@
-package bbgon.irtsu_cas.controllers;
+package bbgon.irtsu_cas.controllers.restControllers;
 
 import bbgon.irtsu_cas.constants.ValidationConstants;
 import bbgon.irtsu_cas.dto.request.DetailProperties;
-import bbgon.irtsu_cas.dto.request.FilterDetailRequest;
 import bbgon.irtsu_cas.dto.response.CustomSuccessResponse;
 import bbgon.irtsu_cas.dto.response.DetailResponse;
 import bbgon.irtsu_cas.dto.response.PageableResponse;
@@ -12,12 +11,10 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 

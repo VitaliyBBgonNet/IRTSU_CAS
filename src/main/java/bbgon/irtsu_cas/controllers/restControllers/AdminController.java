@@ -1,4 +1,4 @@
-package bbgon.irtsu_cas.controllers;
+package bbgon.irtsu_cas.controllers.restControllers;
 
 import bbgon.irtsu_cas.dto.request.GroupEditDataRequest;
 import bbgon.irtsu_cas.dto.request.NewGroupRequest;

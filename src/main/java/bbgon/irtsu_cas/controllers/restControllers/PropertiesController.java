@@ -1,4 +1,4 @@
-package bbgon.irtsu_cas.controllers;
+package bbgon.irtsu_cas.controllers.restControllers;
 
 import bbgon.irtsu_cas.dto.response.PropertiesResponse;
 import bbgon.irtsu_cas.services.impl.PropertiesSourceService;
@@ -7,8 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/properties")

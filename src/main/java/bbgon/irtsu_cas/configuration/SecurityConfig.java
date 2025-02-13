@@ -27,7 +27,9 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/IRTSU/**").permitAll()
+                        .requestMatchers("/authUser/login").permitAll()
                         .requestMatchers("/home").permitAll()
+                        .requestMatchers("/authUser/profile").permitAll()
                         .requestMatchers("/details/all").permitAll()
                         .requestMatchers("/details/filter/**").permitAll()
                         .requestMatchers("/auth/**").permitAll()
