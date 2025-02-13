@@ -19,26 +19,28 @@ import java.time.LocalDateTime;
 public class ElementControllers {
     private final ResourceService resourceService;
 
+    //момент когда попадаем на главную страницу с компонентами
     @GetMapping("/elements")
     public String homePage(Model model) {
+        model.addAttribute("components", resourceService.listAllElements());
         addDefaultAttribute(model);
         return "homePage";
     }
 
-    @PostMapping("/adaptiveFilter")
+    //обновляем таблицу в соответствии с фильтром
+    @PostMapping("/elements")
     public String adaptiveFilter(
-            @RequestParam String componentName,
-            @RequestParam String componentStatus,
-            @RequestParam String ownerName,
-            @RequestParam(required = false)
-            @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime addedDate, Model model) {
-        System.out.println(componentName + " " + componentStatus + " " + ownerName + " " + addedDate);
-        addDefaultAttribute(model);
+            @RequestParam(required = false) String componentName,
+            @RequestParam(required = false) String componentStatus,
+            @RequestParam(required = false) String ownerName, Model model) {
+        model.addAttribute("ownerNames", resourceService.listOwners());
+        model.addAttribute("components",
+                resourceService.getDetailWitchPaginationAndPredicateFilter(
+                0,10,componentName,componentStatus, ownerName));
         return "homePage";
     }
 
     private void addDefaultAttribute(Model model) {
-        model.addAttribute("components", resourceService.listAllElements());
         model.addAttribute("ownerNames", resourceService.listOwners());
         model.addAttribute("name", "Vitaliy");
     }

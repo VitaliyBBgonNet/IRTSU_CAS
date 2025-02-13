@@ -32,7 +32,7 @@
 <div class="container py-3">
     <header>
         <div class="d-flex flex-column flex-md-row align-items-center pb-3 mb-4 border-bottom">
-            <a href="/" class="d-flex align-items-center link-body-emphasis text-decoration-none">
+            <a href="https://rtf.sfedu.ru/" class="d-flex align-items-center link-body-emphasis text-decoration-none">
                 <span class="fs-4">IRTSU CAS</span>
             </a>
 
@@ -46,28 +46,25 @@
     </header>
 
     <div class="row align-items-start">
+        <p class="">Фильтр:</p>
         <div class="col-12 col-md-2 d-flex flex-column align-items-start">
-            <p class="">Фильтр:</p>
-            <form action="/IRTSU/adaptiveFilter" method="post">
+            <form action="/IRTSU/elements" method="post">
                 <input type="text" name="componentName" class="form-control" placeholder="Имя компонента">
                 <br>
-                <select class="form-select" name="componentStatus">
-                    <option value="Все">Все</option>
+                <select class="form-select" name="componentStatus" placeholder="Статус">
+                    <option value=""></option>
                     <option value="В аренде">В аренде</option>
                     <option value="У владельца">У владельца</option>
                 </select>
                 <br>
                 <select class="form-select" name="ownerName">
+                    <option value=""></option>
                     <option  th:each="ownerName : ${ownerNames}" th:value="${ownerName}" th:text="${ownerName}"></option>
                 </select>
-                <br>
-                <input type="datetime-local" name="addedDate" class="form-control" placeholder="Дата добавления">
                 <button type="submit" class="btn btn-sm btn-primary mt-3">Выбрать</button>
             </form>
         </div>
-
         <div class="col">
-
             <table class="table table-sm table-hover" id="componentList">
                 <thead>
                 <tr>
@@ -89,12 +86,16 @@
                     <td th:text="${component.owner}"></td>
                     <td th:text="${component.avatar}"></td>
                 </tr>
-
                 </tbody>
             </table>
         </div>
-
     </div>
+</div>
+<div class="container">
+    <footer class="py-3 my-4">
+        <p class="text-center nav-item nav-link px-2 text-body-secondary text-decoration-none text-reset fs-6"></p>
+        </ul>
+    </footer>
 </div>
 <script src="https://unpkg.com/htmx.org@1.8.4"></script>
 <script src="/docs/5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
