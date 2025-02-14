@@ -38,5 +38,7 @@ public class DetailsEntity {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name =  "rent_id")
     private RentEntity rent;
+
+    private String tenant;
 }
 

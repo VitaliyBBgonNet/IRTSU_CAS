@@ -10,16 +10,6 @@
             <a class="me-3 py-2 link-body-emphasis text-decoration-none" href="#">Support</a>
             <a class="py-2 link-body-emphasis text-decoration-none" href="#">Pricing</a>
         </nav>
-        <button id="logoutBtn" class="btn btn-danger">Выйти</button>
-    </div>
-    <script>
-        // Слушаем событие клика на кнопку выхода
-        document.getElementById("logoutBtn").addEventListener("click", function() {
-            // Удаляем токен из localStorage
-            localStorage.removeItem('token');
 
-            // Перенаправляем на страницу авторизации
-            window.location.href = "/authUser/login";
-        });
-    </script>
+    </div>
 </header>

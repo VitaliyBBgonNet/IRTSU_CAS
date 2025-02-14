@@ -32,19 +32,6 @@ public class DetailsController {
         return ResponseEntity.ok(detailsService.createDetail(detail));
     }
 
-    @PostMapping("addNewDetail")
-    public ResponseEntity<CustomSuccessResponse<String>> addNewDetail(
-            @RequestParam(required = false) String componentName,
-            @RequestParam(required = false) String componentStatus,
-            @RequestParam(required = false) String componentDocumentation,
-            @RequestParam(required = false) String componentDescription) {
-        return ResponseEntity.ok(detailsService.addNewDetails(
-                componentName,
-                componentStatus,
-                componentDocumentation,
-                componentDescription));
-    }
-
     @GetMapping("/all")
     public ResponseEntity<CustomSuccessResponse<PageableResponse<List<DetailResponse>>>> getDetails(
             @RequestParam(value = "page", defaultValue = "1")

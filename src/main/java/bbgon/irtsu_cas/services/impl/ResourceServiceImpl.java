@@ -56,7 +56,8 @@ public class ResourceServiceImpl implements ResourceService {
                             detailsEntity.getDescription(),
                             detailsEntity.getStatus(),
                             detailsEntity.getOwner().getName() + " " + detailsEntity.getOwner().getLastName(),
-                            detailsEntity.getOwner().getAvatar());
+                            detailsEntity.getOwner().getAvatar(),
+                            detailsEntity.getTenant());
                 }).toList();
     }
 
@@ -89,7 +90,8 @@ public class ResourceServiceImpl implements ResourceService {
                             entity.getDescription(),
                             entity.getStatus(),
                             entity.getOwner().getName() + " " + entity.getOwner().getLastName(),
-                            entity.getOwner().getAvatar());
+                            entity.getOwner().getAvatar(),
+                            entity.getTenant());
                 }).toList();
 
         System.out.println(result.iterator().hasNext());

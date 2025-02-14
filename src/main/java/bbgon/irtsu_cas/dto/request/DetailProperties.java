@@ -18,4 +18,6 @@ public class DetailProperties {
     String documentation;
 
     String image;
+
+    String tenant;
 }

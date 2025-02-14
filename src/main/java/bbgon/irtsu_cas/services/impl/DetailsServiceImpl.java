@@ -51,24 +51,7 @@ public class DetailsServiceImpl implements DetailsService {
         detailsEntity.setStatus(detailProperties.getStatus());
         detailsEntity.setImage(detailProperties.getImage());
         detailsEntity.setRent(null);
-        detailsRepository.save(detailsEntity);
-        return new CustomSuccessResponse<>("DETAIL ADD");
-    }
-
-    @Override
-    public CustomSuccessResponse<String> addNewDetails(
-            String componentName,
-            String componentStatus,
-            String componentDocumentation,
-            String componentDescription) {
-        DetailsEntity detailsEntity = new DetailsEntity();
-        detailsEntity.setCreatedDetail(LocalDateTime.now());
-        detailsEntity.setDescription(componentDescription);
-        detailsEntity.setName(componentName);
-        detailsEntity.setOwner(userService.findUserEntityById(userService.getUserIdByToken()));
-        detailsEntity.setDocumentation(componentDocumentation);
-        detailsEntity.setStatus(componentStatus);
-        detailsEntity.setRent(null);
+        detailsEntity.setTenant(detailProperties.getTenant());
         detailsRepository.save(detailsEntity);
         return new CustomSuccessResponse<>("DETAIL ADD");
     }

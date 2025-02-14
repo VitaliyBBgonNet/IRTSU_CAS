@@ -29,9 +29,15 @@
         <div class="form-group">
             <label>Выберете статус компонента</label>
             <select class="form-select" id="componentStatus" name="componentStatus">
-                <option value="В аренде">В аренде</option>
                 <option value="У владельца">У владельца</option>
+                <option value="В аренде">В аренде</option>
             </select>
+
+            <div class="form-group" id="rentedByField" style="display: none;">
+                <label>Имя арендатора</label>
+                <input type="text" class="form-control" id="rentedBy" name="rentedBy" placeholder="Введите имя арендатора">
+            </div>
+
         </div>
         <div class="form-group">
             <label>Ссылка на документацию</label>
@@ -76,6 +82,7 @@
                 <th>Описание</th>
                 <th>Статус</th>
                 <th class="d-none d-sm-table-cell">Владелец</th>
+                <th class="d-none d-sm-table-cell">Арендатор</th>
             </tr>
             </thead>
             <tbody>
@@ -87,11 +94,38 @@
               (${component.status == 'В аренде'} ? 'color: red;' : '')">
                 </td>
                 <td th:text="${component.owner}"></td>
+                <td th:text="${component.tenant}"></td>
             </tr>
             </tbody>
         </table>
     </div>
+
+    <button id="logoutBtn" class="btn btn-danger">Выйти</button>
 </div>
+
+<script>
+    document.getElementById('componentStatus').addEventListener('change', function() {
+        let rentedByField = document.getElementById('rentedByField');
+
+        if (this.value === 'В аренде') {
+            rentedByField.style.display = 'block';  // Показываем поле
+        } else {
+            rentedByField.style.display = 'none';   // Скрываем поле
+            document.getElementById('rentedBy').value = ''; // Очищаем поле
+        }
+    });
+</script>
+
+<script>
+    // Слушаем событие клика на кнопку выхода
+    document.getElementById("logoutBtn").addEventListener("click", function() {
+        // Удаляем токен из localStorage
+        localStorage.removeItem('token');
+
+        // Перенаправляем на страницу авторизации
+        window.location.href = "/authUser/login";
+    });
+</script>
 
 <script src="https://unpkg.com/htmx.org@1.8.4"></script>
 <script src="/docs/5.3/dist/js/bootstrap.bundle.min.js"
@@ -119,14 +153,21 @@
         const componentStatus = document.getElementById('componentStatus').value;
         const componentDocumentation = document.getElementById('componentDocumentation').value;
         const componentDescription = document.getElementById('componentDescription').value;
+        const rentedBy = document.getElementById('rentedBy').value
 
         // Создаем объект JSON
         const data = {
             name: componentName,
             description: componentDescription,
             status: componentStatus,
-            documentation: componentDocumentation
+            documentation: componentDocumentation,
+            tenant: rentedBy
         };
+
+        let rentedByField = document.getElementById('rentedByField');
+        rentedByField.style.display = 'none';   // Скрываем поле
+        document.getElementById('rentedBy').value = ''; // Очищаем поле
+
 
         // Получаем токен из localStorage
         const token = localStorage.getItem('token');
@@ -149,8 +190,7 @@
                     }
                 })
                 .then(data => {
-                    console.log('Ответ от сервера:', data);
-                    // Обработать ответ от сервера, например, показать сообщение или обновить UI
+                document.getElementById('addDetailForm').reset();
                 })
                 .catch(error => {
                     console.error('Ошибка:', error);

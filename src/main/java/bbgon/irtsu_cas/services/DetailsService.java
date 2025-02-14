@@ -13,12 +13,6 @@ import java.util.UUID;
 public interface DetailsService {
     CustomSuccessResponse<String> createDetail(DetailProperties detailProperties);
 
-    CustomSuccessResponse<String> addNewDetails(
-            String componentName,
-            String componentStatus,
-            String componentDocumentation,
-            String componentDescription);
-
     CustomSuccessResponse<PageableResponse<List<DetailResponse>>> getDetailsPagination(Integer page, Integer perPage);
 
     CustomSuccessResponse<String> deleteListDetails(List<UUID> uuidList);

@@ -15,4 +15,6 @@ public class TableElementResponse {
     private String owner;
 
     private String avatar;
+
+    private String tenant;
 }
