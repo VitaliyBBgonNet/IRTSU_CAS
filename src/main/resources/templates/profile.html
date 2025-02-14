@@ -6,7 +6,6 @@
     <title>Profile</title>
 </head>
 <body>
-<body>
 <div class="container py-3">
     <div th:replace="~{header.html :: header}"></div>
 
@@ -14,36 +13,42 @@
         <img src="..." class="rounded" alt="...">
     </div>
     <div class="text-center">
-        <p>ФИО</p>
+        <p id="full-name"
+           hx-get="/data/profile"
+           hx-trigger="load"
+           hx-target="#full-name"
+           hx-swap="innerHTML">
+            Загрузка...
+        </p>
     </div>
-    <form>
+    <form id="addDetailForm">
         <div class="form-group">
             <label>Наименование компонента</label>
-            <input class="form-control" placeholder="Ведите наименование компонента">
+            <input type="text" class="form-control" placeholder="Введите наименование компонента" id="componentName" name="componentName">
         </div>
-        <div>
+        <div class="form-group">
             <label>Выберете статус компонента</label>
-            <select class="form-select" name="componentStatus" placeholder="Статус">
-                <option value=""></option>
+            <select class="form-select" id="componentStatus" name="componentStatus">
                 <option value="В аренде">В аренде</option>
                 <option value="У владельца">У владельца</option>
             </select>
         </div>
         <div class="form-group">
             <label>Ссылка на документацию</label>
-            <input type="text" class="form-control" placeholder="Добавьте ссылку на документацию">
+            <input type="text" class="form-control" placeholder="Добавьте ссылку на документацию" id="componentDocumentation" name="componentDocumentation">
         </div>
         <div class="form-group">
             <label>Описание</label>
-            <textarea class="form-control" rows="3"></textarea>
+            <textarea class="form-control" rows="3" id="componentDescription" name="componentDescription"></textarea>
         </div>
         <br>
         <button type="submit" class="btn btn-primary">Добавить</button>
     </form>
+
     <hr>
     <p class="fw-bold">Фильтр:</p>
     <div class="col-12">
-        <form action="/IRTSU/elements" method="post">
+        <form action="/authUser/profile" method="post">
             <div class="d-flex flex-wrap align-items-center gap-2">
                 <input type="text" name="componentName" class="form-control w-auto" placeholder="Имя компонента">
 
@@ -86,7 +91,6 @@
             </tbody>
         </table>
     </div>
-
 </div>
 
 <script src="https://unpkg.com/htmx.org@1.8.4"></script>
@@ -95,35 +99,68 @@
         crossorigin="anonymous"></script>
 
 <script>
-    document.addEventListener("DOMContentLoaded", async function () {
-        let token = localStorage.getItem('token');  // Получаем токен из localStorage
-
+    // Слушаем событие конфигурации запроса в HTMX
+    document.addEventListener("htmx:configRequest", function(event) {
+        // Получаем токен из localStorage
+        let token = localStorage.getItem("token");
         if (token) {
-            try {
-                // Отправляем запрос на защищенную страницу с токеном в заголовке
-                let response = await fetch("/authUser/profile", {
-                    method: "GET",
-                    headers: {
-                        "Authorization": "Bearer " + token  // Прикрепляем токен
-                    }
-                });
-
-                if (response.ok) {
-                    let data = await response.json();
-                    // Отображаем данные профиля (если нужно)
-                    console.log("Данные профиля:", data);
-                } else {
-                    // Если токен невалиден или не существует, редиректим на страницу логина
-                    window.location.href = "/auth/login";
-                }
-            } catch (error) {
-                console.error("Ошибка при получении данных профиля:", error);
-            }
-        } else {
-            // Если токен отсутствует, редиректим на страницу логина
-            window.location.href = "/auth/login";
+            // Добавляем токен в заголовок запроса
+            event.detail.headers['Authorization'] = 'Bearer ' + token;
         }
     });
+</script>
+
+<script>
+    document.getElementById('addDetailForm').addEventListener('submit', function(event) {
+        event.preventDefault();  // Предотвратить стандартное поведение формы (перезагрузку страницы)
+
+        // Получаем значения с формы
+        const componentName = document.getElementById('componentName').value;
+        const componentStatus = document.getElementById('componentStatus').value;
+        const componentDocumentation = document.getElementById('componentDocumentation').value;
+        const componentDescription = document.getElementById('componentDescription').value;
+
+        // Создаем объект JSON
+        const data = {
+            name: componentName,
+            description: componentDescription,
+            status: componentStatus,
+            documentation: componentDocumentation
+        };
+
+        // Получаем токен из localStorage
+        const token = localStorage.getItem('token');
+
+        if (token) {
+            // Отправляем данные на сервер с использованием fetch
+            fetch('/details', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + token,  // Убедитесь, что токен передается в заголовке
+                    'Content-Type': 'application/json'  // Указываем, что тело запроса в формате JSON
+                },
+                body: JSON.stringify(data)  // Преобразуем объект в JSON строку
+            })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        throw new Error('Ошибка при отправке данных');
+                    }
+                })
+                .then(data => {
+                    console.log('Ответ от сервера:', data);
+                    // Обработать ответ от сервера, например, показать сообщение или обновить UI
+                })
+                .catch(error => {
+                    console.error('Ошибка:', error);
+                });
+        } else {
+            console.error('Токен отсутствует');
+            // Обработать отсутствие токена (например, перенаправить на страницу авторизации)
+        }
+    });
+
 </script>
 
 </body>

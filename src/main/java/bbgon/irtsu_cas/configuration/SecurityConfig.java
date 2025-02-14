@@ -26,6 +26,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/addNewDetail").permitAll()
+                        .requestMatchers("/docs").permitAll()
                         .requestMatchers("/IRTSU/**").permitAll()
                         .requestMatchers("/authUser/login").permitAll()
                         .requestMatchers("/home").permitAll()

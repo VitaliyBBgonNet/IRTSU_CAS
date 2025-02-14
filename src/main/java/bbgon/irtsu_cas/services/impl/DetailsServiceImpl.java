@@ -5,7 +5,8 @@ import bbgon.irtsu_cas.dto.response.CustomSuccessResponse;
 import bbgon.irtsu_cas.dto.response.DetailResponse;
 import bbgon.irtsu_cas.dto.response.OwnerDTO;
 import bbgon.irtsu_cas.dto.response.PageableResponse;
-import bbgon.irtsu_cas.entity.*;
+import bbgon.irtsu_cas.entity.DetailsEntity;
+import bbgon.irtsu_cas.entity.QDetailsEntity;
 import bbgon.irtsu_cas.mappers.DetailMapper;
 import bbgon.irtsu_cas.repositories.DetailsRepository;
 import bbgon.irtsu_cas.services.DetailsService;
@@ -55,6 +56,24 @@ public class DetailsServiceImpl implements DetailsService {
     }
 
     @Override
+    public CustomSuccessResponse<String> addNewDetails(
+            String componentName,
+            String componentStatus,
+            String componentDocumentation,
+            String componentDescription) {
+        DetailsEntity detailsEntity = new DetailsEntity();
+        detailsEntity.setCreatedDetail(LocalDateTime.now());
+        detailsEntity.setDescription(componentDescription);
+        detailsEntity.setName(componentName);
+        detailsEntity.setOwner(userService.findUserEntityById(userService.getUserIdByToken()));
+        detailsEntity.setDocumentation(componentDocumentation);
+        detailsEntity.setStatus(componentStatus);
+        detailsEntity.setRent(null);
+        detailsRepository.save(detailsEntity);
+        return new CustomSuccessResponse<>("DETAIL ADD");
+    }
+
+    @Override
     public CustomSuccessResponse<PageableResponse<List<DetailResponse>>> getDetailsPagination(Integer page, Integer perPage) {
 
         PageRequest pageRequest = PageRequest.of(page - 1, perPage);
@@ -94,7 +113,7 @@ public class DetailsServiceImpl implements DetailsService {
         Pageable pageable = PageRequest.of(page, perPage);
 
         Predicate predicate = QPredicates.builder()
-                .add(detailName , detailsEntity.name::containsIgnoreCase)
+                .add(detailName, detailsEntity.name::containsIgnoreCase)
                 .add(status, detailsEntity.status::containsIgnoreCase)
                 .add(ownerId, detailsEntity.owner.id::eq)
                 .add(orderHumanId, detailsEntity.rent.id::eq)
@@ -102,14 +121,14 @@ public class DetailsServiceImpl implements DetailsService {
                 .add(dataAdd, detailsEntity.createdDetail::eq)
                 .buildAnd();
 
-        Page<DetailsEntity> result =  detailsRepository.findAll(predicate, pageable);
+        Page<DetailsEntity> result = detailsRepository.findAll(predicate, pageable);
 
         List<DetailResponse> detailResponseList = result.getContent().stream()
-                        .map(entity -> {
-                            DetailResponse detailResponse = new DetailResponse();
-                            detailResponse = detailMapper.toResponse(entity);
-                            return detailResponse;
-                        }).toList();
+                .map(entity -> {
+                    DetailResponse detailResponse = new DetailResponse();
+                    detailResponse = detailMapper.toResponse(entity);
+                    return detailResponse;
+                }).toList();
 
         System.out.println(result.iterator().hasNext());
 

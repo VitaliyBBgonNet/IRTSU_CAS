@@ -5,12 +5,14 @@
     <title>Login</title>
     <link rel="stylesheet" th:href="@{/css/login.css}" type="text/css">
     <script src="https://unpkg.com/htmx.org@1.9.5"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
 </head>
 <body>
 <div class="login-container">
     <div class="login-box">
         <div class="login-title">IRTSU CAS</div>
         <form class="login-form"
+              th:object="${loginForm}"
               hx-post="/auth/login"
               hx-trigger="submit"
               hx-target="body"
@@ -26,6 +28,7 @@
                         class="form-input"
                         placeholder="Введите email"
                         required
+                        th:field="*{email}"
                 />
             </div>
             <div class="form-group">
@@ -37,6 +40,7 @@
                         class="form-input"
                         placeholder="Введите пароль"
                         required
+                        th:field="*{password}"
                 />
             </div>
             <button type="submit" class="login-button">Войти</button>
@@ -59,8 +63,7 @@
                     localStorage.setItem('token', token);
                     document.getElementById("response").innerHTML = "<div style='color: green;'>Авторизация успешна</div>";
                     console.log("Токен сохранен:", token);
-                    window.location.href = "/IRTSU/elements";
-
+                    window.location.href = "/authUser/profile";
                 } else {
                     document.getElementById("response").innerHTML = "<div style='color: red;'>Ошибка авторизации</div>";
                 }

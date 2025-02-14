@@ -27,11 +27,10 @@ public class AuthController {
         return ResponseEntity.ok(authService.registrationUser(registration));
     }
 
-    @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/login")
     public ResponseEntity<CustomSuccessResponse<LoginUserResponse>> authorizationUser(
             @RequestBody
             @Valid AuthUserRequest authUserRequest) {
-        System.out.println("any");
         return ResponseEntity.ok(authService.authorizationUser(authUserRequest));
     }
 

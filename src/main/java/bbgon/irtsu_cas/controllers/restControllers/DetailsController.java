@@ -28,8 +28,21 @@ public class DetailsController {
     @PostMapping
     public ResponseEntity<CustomSuccessResponse<String>> createdDetail(
             @RequestBody
-            @Valid DetailProperties detail){
+            @Valid DetailProperties detail) {
         return ResponseEntity.ok(detailsService.createDetail(detail));
+    }
+
+    @PostMapping("addNewDetail")
+    public ResponseEntity<CustomSuccessResponse<String>> addNewDetail(
+            @RequestParam(required = false) String componentName,
+            @RequestParam(required = false) String componentStatus,
+            @RequestParam(required = false) String componentDocumentation,
+            @RequestParam(required = false) String componentDescription) {
+        return ResponseEntity.ok(detailsService.addNewDetails(
+                componentName,
+                componentStatus,
+                componentDocumentation,
+                componentDescription));
     }
 
     @GetMapping("/all")
@@ -41,7 +54,7 @@ public class DetailsController {
             @RequestParam(value = "perPage", defaultValue = "10")
             @Min(value = 1, message = ValidationConstants.PARAM_PER_PAGE_NOT_NULL)
             @Positive(message = ValidationConstants.TASKS_PER_PAGE_GREATER_OR_EQUAL_1)
-            @Max(value = 100, message = ValidationConstants.TASKS_PER_PAGE_LESS_OR_EQUAL_100) Integer perPage){
+            @Max(value = 100, message = ValidationConstants.TASKS_PER_PAGE_LESS_OR_EQUAL_100) Integer perPage) {
         return ResponseEntity.ok(detailsService.getDetailsPagination(page, perPage));
     }
 
@@ -57,18 +70,18 @@ public class DetailsController {
             @Max(value = 100, message = ValidationConstants.TASKS_PER_PAGE_LESS_OR_EQUAL_100) Integer perPage,
 
             @RequestParam(value = "name", required = false) String name,
-            @RequestParam(value = "status",required = false) String status,
-            @RequestParam(value = "ownerName",required = false) String ownerName,
-            @RequestParam(value = "lastName",required = false) String lastName,
-            @RequestParam(value = "surName",required = false) String surName,
-            @RequestParam(value = "UUID",required = false) UUID ownerID,
-            @RequestParam(value = "created",required = false) LocalDateTime created){
+            @RequestParam(value = "status", required = false) String status,
+            @RequestParam(value = "ownerName", required = false) String ownerName,
+            @RequestParam(value = "lastName", required = false) String lastName,
+            @RequestParam(value = "surName", required = false) String surName,
+            @RequestParam(value = "UUID", required = false) UUID ownerID,
+            @RequestParam(value = "created", required = false) LocalDateTime created) {
         return ResponseEntity.ok(detailsService.getDetailsPagination(page, perPage));
     }
 
     @DeleteMapping("/list_deleted")
     public ResponseEntity<CustomSuccessResponse<String>> deleteDetailsList(
-            @RequestBody List<UUID> uuidList){
+            @RequestBody List<UUID> uuidList) {
         return ResponseEntity.ok(detailsService.deleteListDetails(uuidList));
     }
 
@@ -84,14 +97,14 @@ public class DetailsController {
             @RequestParam(required = false) String dataAdd
     ) {
 
-               CustomSuccessResponse<PageableResponse<List<DetailResponse>>> response =
+        CustomSuccessResponse<PageableResponse<List<DetailResponse>>> response =
                 detailsService.getDetailWitchPaginationAndPredicateFilter(page, perPage,
                         detailName,
                         status,
                         ownerId,
                         orderHumanId,
                         groupId,
-                        dataAdd );
+                        dataAdd);
 
         return ResponseEntity.ok(response);
     }
