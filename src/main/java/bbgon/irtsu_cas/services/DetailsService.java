@@ -2,16 +2,15 @@ package bbgon.irtsu_cas.services;
 
 import bbgon.irtsu_cas.dto.request.DetailProperties;
 import bbgon.irtsu_cas.dto.request.FilterDetailRequest;
-import bbgon.irtsu_cas.dto.response.CustomSuccessResponse;
-import bbgon.irtsu_cas.dto.response.DetailResponse;
-import bbgon.irtsu_cas.dto.response.PageableResponse;
-import bbgon.irtsu_cas.dto.response.TableElementResponse;
+import bbgon.irtsu_cas.dto.response.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
 public interface DetailsService {
+
+    CustomSuccessResponse<SuccessResponse> deleteElementById(String id);
 
     List<TableElementResponse> getDetailsForAuthUser();
 

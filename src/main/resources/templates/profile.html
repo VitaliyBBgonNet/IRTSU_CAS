@@ -73,7 +73,7 @@
                 </select>
 
                 <button type="submit" class="btn btn-primary">Выбрать</button>
-                <button id="loadTableBtn" class="btn btn-primary">Загрузить данные</button>
+                <button id="loadTableBtn" class="btn btn-primary">Мои компоненты</button>
             </div>
         </form>
     </div>
@@ -87,6 +87,7 @@
                 <th>Описание</th>
                 <th>Статус</th>
                 <th>Владелец</th>
+                <th>Действие</th>
             </tr>
             </thead>
             <tbody id="componentListBody">  <!-- Важно, чтобы у tbody был ID -->
@@ -228,11 +229,19 @@
                         component.status === "В аренде" ? "color: red;" : "";
 
                     row.innerHTML = `
-                <td class="shortened-id" >${component.id}</td>
+                <td  > <p class="shortened-id">${component.id}</p></td>
                 <td>${component.name}</td>
                 <td>${component.description}</td>
                 <td style="${statusColor}">${component.status}</td>
                 <td>${component.owner || "—"}</td>
+                <td>
+                <button id = "deleteComponentButton" class="btn btn-danger btn-sm delete-btn" data-id="${component.id}">Удалить</button>
+                <button style="height: 32px" type="button" class="btn btn-secondary">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen-fill" viewBox="0 0 16 16">
+  <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001"></path>
+</svg>
+              </button>
+            </td>
             `;
 
                     tableBody.appendChild(row);
@@ -241,6 +250,36 @@
             .catch(error => console.error("Ошибка загрузки данных:", error));
     });
 
+</script>
+
+<script>
+    document.getElementById("componentListBody").addEventListener("click", function(event) {
+        if (event.target.classList.contains("delete-btn")) {
+            const itemId = event.target.getAttribute("data-id");
+
+            if (!confirm(`Вы уверены, что хотите удалить компонент с ID ${itemId}?`)) {
+                return; // Если пользователь отменил удаление
+            }
+
+            fetch(`/details/deleteThis`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + localStorage.getItem("token")
+                },
+                body: JSON.stringify({ id: itemId })
+            })
+                .then(response => {
+                    if (!response.ok) throw new Error("Ошибка при удалении!");
+                    return response.json();
+                })
+                .then(data => {
+                    alert("Компонент успешно удалён!");
+                    document.getElementById("loadTableBtn").click(); // Обновляем таблицу
+                })
+                .catch(error => console.error("Ошибка удаления:", error));
+        }
+    });
 </script>
 
 </body>

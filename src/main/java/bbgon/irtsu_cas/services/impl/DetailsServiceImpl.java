@@ -22,6 +22,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Component
@@ -36,6 +37,21 @@ public class DetailsServiceImpl implements DetailsService {
 
     @PersistenceContext
     private final EntityManager entityManager;
+
+    @Override
+    public CustomSuccessResponse<SuccessResponse> deleteElementById(String idElement) {
+
+        UUID uuidAuthUser = userService.getUserIdByToken();
+
+        Optional<DetailsEntity> detailsEntityOptional = detailsRepository.findById(UUID.fromString(idElement));
+        if (detailsEntityOptional.isPresent()) {
+            DetailsEntity detailsEntity = detailsEntityOptional.get();
+            if(detailsEntity.getOwner().getId().equals(uuidAuthUser)) {
+                detailsRepository.delete(detailsEntity);
+            }
+        }
+        return new CustomSuccessResponse<>(new SuccessResponse());
+    }
 
     @Override
     public List<TableElementResponse> getDetailsForAuthUser() {

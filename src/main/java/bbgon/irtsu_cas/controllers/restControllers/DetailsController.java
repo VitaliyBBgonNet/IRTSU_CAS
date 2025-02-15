@@ -2,10 +2,7 @@ package bbgon.irtsu_cas.controllers.restControllers;
 
 import bbgon.irtsu_cas.constants.ValidationConstants;
 import bbgon.irtsu_cas.dto.request.DetailProperties;
-import bbgon.irtsu_cas.dto.response.CustomSuccessResponse;
-import bbgon.irtsu_cas.dto.response.DetailResponse;
-import bbgon.irtsu_cas.dto.response.PageableResponse;
-import bbgon.irtsu_cas.dto.response.TableElementResponse;
+import bbgon.irtsu_cas.dto.response.*;
 import bbgon.irtsu_cas.services.DetailsService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
@@ -18,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -39,6 +37,11 @@ public class DetailsController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_TYPE, "application/json")
                 .body(detailsService.getDetailsForAuthUser());
+    }
+
+    @PostMapping("/deleteThis")
+    public ResponseEntity<CustomSuccessResponse<SuccessResponse>> deleteDetail(@RequestBody Map<String, UUID> requestBody) {
+        return ResponseEntity.ok(detailsService.deleteElementById(requestBody.get("id").toString()));
     }
 
     @GetMapping("/all")
