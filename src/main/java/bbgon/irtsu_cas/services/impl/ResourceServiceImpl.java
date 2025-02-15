@@ -1,10 +1,15 @@
 package bbgon.irtsu_cas.services.impl;
 
 import bbgon.irtsu_cas.dto.FIO;
+import bbgon.irtsu_cas.dto.request.FilterDetailRequest;
+import bbgon.irtsu_cas.dto.response.CustomSuccessResponse;
+import bbgon.irtsu_cas.dto.response.DetailResponse;
+import bbgon.irtsu_cas.dto.response.PageableResponse;
 import bbgon.irtsu_cas.dto.response.TableElementResponse;
 import bbgon.irtsu_cas.entity.DetailsEntity;
 import bbgon.irtsu_cas.entity.QDetailsEntity;
 import bbgon.irtsu_cas.repositories.DetailsRepository;
+import bbgon.irtsu_cas.services.UserService;
 import bbgon.irtsu_cas.util.QPredicates;
 import com.querydsl.core.types.Predicate;
 import jakarta.persistence.EntityManager;
@@ -25,6 +30,8 @@ import java.util.UUID;
 public class ResourceServiceImpl implements ResourceService {
 
     private final DetailsRepository detailsRepository;
+
+    private final UserService userService;
 
     @PersistenceContext
     private final EntityManager entityManager;
@@ -62,20 +69,38 @@ public class ResourceServiceImpl implements ResourceService {
                 }).toList();
     }
 
+    public List<TableElementResponse> getDetailWitchPaginationFilterForAuthUser(
+            FilterDetailRequest filterDetailRequest){
+
+        UUID uuidAuthUser = userService.getUserIdByToken();
+
+        return getDetailWitchPaginationAndPredicateFilter(
+                0,
+                10,
+                filterDetailRequest.getName(),
+                filterDetailRequest.getStatus(),
+                null,
+                uuidAuthUser);
+    }
+
     @Override
     public List<TableElementResponse> getDetailWitchPaginationAndPredicateFilter(
             Integer page, Integer perPage,
             String detailName,
             String status,
-            String ownerFullName) {
+            String ownerFullName, UUID ownerId) {
 
         QDetailsEntity detailsEntity = QDetailsEntity.detailsEntity;
 
-        FIO fio = splitFullName(ownerFullName);
+        FIO fio = new FIO();
+        if(ownerFullName != null) {
+            fio = splitFullName(ownerFullName);
+        }
 
         Pageable pageable = PageRequest.of(page, perPage);
 
         Predicate predicate = QPredicates.builder()
+                .add(ownerId, detailsEntity.owner.id::eq)
                 .add(detailName , detailsEntity.name::containsIgnoreCase)
                 .add(status, detailsEntity.status::containsIgnoreCase)
                 .add(fio.getName(), detailsEntity.owner.name::containsIgnoreCase)

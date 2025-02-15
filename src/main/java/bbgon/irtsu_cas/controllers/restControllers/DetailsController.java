@@ -2,8 +2,10 @@ package bbgon.irtsu_cas.controllers.restControllers;
 
 import bbgon.irtsu_cas.constants.ValidationConstants;
 import bbgon.irtsu_cas.dto.request.DetailProperties;
+import bbgon.irtsu_cas.dto.request.FilterDetailRequest;
 import bbgon.irtsu_cas.dto.response.*;
 import bbgon.irtsu_cas.services.DetailsService;
+import bbgon.irtsu_cas.services.impl.ResourceService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -25,6 +27,8 @@ public class DetailsController {
 
     private final DetailsService detailsService;
 
+    private final ResourceService resourceService;
+
     @PostMapping
     public ResponseEntity<CustomSuccessResponse<String>> createdDetail(
             @RequestBody
@@ -37,6 +41,15 @@ public class DetailsController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_TYPE, "application/json")
                 .body(detailsService.getDetailsForAuthUser());
+    }
+
+    @PostMapping("/getDetailWitchPaginationFilterForAuthUser")
+    public ResponseEntity<List<TableElementResponse>> getDetailWitchPaginationFilterForAuthUser(
+            @RequestBody FilterDetailRequest filterDetailRequest
+            ){
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_TYPE, "application/json")
+                .body(resourceService.getDetailWitchPaginationFilterForAuthUser(filterDetailRequest));
     }
 
     @PostMapping("/deleteThis")
@@ -83,6 +96,8 @@ public class DetailsController {
             @RequestBody List<UUID> uuidList) {
         return ResponseEntity.ok(detailsService.deleteListDetails(uuidList));
     }
+
+
 
     @GetMapping("/getDetailWitchFilter")
     public ResponseEntity<CustomSuccessResponse<PageableResponse<List<DetailResponse>>>> getDetails(

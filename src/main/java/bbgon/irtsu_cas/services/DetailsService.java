@@ -1,10 +1,8 @@
 package bbgon.irtsu_cas.services;
 
 import bbgon.irtsu_cas.dto.request.DetailProperties;
-import bbgon.irtsu_cas.dto.request.FilterDetailRequest;
 import bbgon.irtsu_cas.dto.response.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 

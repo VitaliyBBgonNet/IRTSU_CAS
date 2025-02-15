@@ -36,7 +36,7 @@ public class ElementControllers {
         model.addAttribute("ownerNames", resourceService.listOwners());
         model.addAttribute("components",
                 resourceService.getDetailWitchPaginationAndPredicateFilter(
-                0,10,componentName,componentStatus, ownerName));
+                0,10,componentName,componentStatus, ownerName, null));
         return "homePage";
     }
 

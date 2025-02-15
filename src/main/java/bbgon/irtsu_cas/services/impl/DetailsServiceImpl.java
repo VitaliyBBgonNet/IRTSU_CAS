@@ -1,6 +1,7 @@
 package bbgon.irtsu_cas.services.impl;
 
 import bbgon.irtsu_cas.dto.request.DetailProperties;
+import bbgon.irtsu_cas.dto.request.FilterDetailRequest;
 import bbgon.irtsu_cas.dto.response.*;
 import bbgon.irtsu_cas.entity.DetailsEntity;
 import bbgon.irtsu_cas.entity.QDetailsEntity;

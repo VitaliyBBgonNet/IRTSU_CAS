@@ -11,12 +11,4 @@ public class FilterDetailRequest {
     String name;
 
     String status;
-
-    UUID ownerId;
-
-    UUID orderHumanId;
-
-    UUID groupId;
-
-    LocalDateTime dataAdd;
 }

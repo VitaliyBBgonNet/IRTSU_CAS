@@ -57,19 +57,14 @@
     <hr>
     <p class="fw-bold">Фильтр:</p>
     <div class="col-12">
-        <form action="/authUser/profile" method="post">
+        <form id="filterForm">
             <div class="d-flex flex-wrap align-items-center gap-2">
-                <input type="text" name="componentName" class="form-control w-auto" placeholder="Имя компонента">
+                <input type="text" id="componentNameFilter" class="form-control w-auto" placeholder="Имя компонента">
 
-                <select class="form-select w-auto" name="componentStatus">
+                <select id="componentStatusFilter" class="form-select w-auto">
                     <option value="">Статус</option>
                     <option value="В аренде">В аренде</option>
                     <option value="У владельца">У владельца</option>
-                </select>
-
-                <select class="form-select w-auto" name="ownerName">
-                    <option value="">Выберите владельца</option>
-                    <option th:each="ownerName : ${ownerNames}" th:value="${ownerName}" th:text="${ownerName}"></option>
                 </select>
 
                 <button type="submit" class="btn btn-primary">Выбрать</button>
@@ -87,6 +82,7 @@
                 <th>Описание</th>
                 <th>Статус</th>
                 <th>Владелец</th>
+                <th>Арендатор</th>
                 <th>Действие</th>
             </tr>
             </thead>
@@ -98,6 +94,66 @@
 
     <button id="logoutBtn" class="btn btn-danger">Выйти</button>
 </div>
+
+<script>
+    document.getElementById("filterForm").addEventListener("submit", function(event) {
+        event.preventDefault(); // Останавливаем стандартное действие отправки формы
+
+        // Собираем данные из формы
+        const filterData = {
+            name: document.getElementById("componentNameFilter").value.trim(),
+            status: document.getElementById("componentStatusFilter").value,
+        };
+
+        // Получаем токен (если есть)
+        const token = localStorage.getItem("token");
+
+        // Отправляем POST-запрос
+        fetch("/details/getDetailWitchPaginationFilterForAuthUser", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": token ? "Bearer " + token : ""
+            },
+            body: JSON.stringify(filterData)
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Ошибка загрузки данных");
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Обновляем таблицу с результатами
+                let tableBody = document.getElementById("componentListBody");
+                tableBody.innerHTML = ""; // Очищаем таблицу перед обновлением
+
+                data.forEach(component => {
+                    let row = document.createElement("tr");
+
+                    // Определяем цвет статуса
+                    let statusColor = component.status === "У владельца" ? "color: green;" :
+                        component.status === "В аренде" ? "color: red;" : "";
+
+                    row.innerHTML = `
+                <td  > <p class="shortened-id">${component.id}</p></td>
+                <td>${component.name}</td>
+                <td>${component.description}</td>
+                <td style="${statusColor}">${component.status}</td>
+                <td>${component.owner || "—"}</td>
+                <td>${component.tenant || "-"}</td>
+                <td>
+                <button id = "deleteComponentButton" class="btn btn-danger btn-sm delete-btn" data-id="${component.id}">Удалить</button>
+            </td>
+            `;
+
+                    tableBody.appendChild(row);
+                });
+            })
+            .catch(error => console.error("Ошибка загрузки данных:", error));
+    });
+</script>
+
 
 <script>
     document.getElementById('componentStatus').addEventListener('change', function() {
@@ -234,13 +290,9 @@
                 <td>${component.description}</td>
                 <td style="${statusColor}">${component.status}</td>
                 <td>${component.owner || "—"}</td>
+                <td>${component.tenant || "-"}</td>
                 <td>
                 <button id = "deleteComponentButton" class="btn btn-danger btn-sm delete-btn" data-id="${component.id}">Удалить</button>
-                <button style="height: 32px" type="button" class="btn btn-secondary">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen-fill" viewBox="0 0 16 16">
-  <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001"></path>
-</svg>
-              </button>
             </td>
             `;
 
