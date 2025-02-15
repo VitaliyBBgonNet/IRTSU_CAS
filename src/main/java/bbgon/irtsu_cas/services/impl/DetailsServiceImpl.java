@@ -1,10 +1,7 @@
 package bbgon.irtsu_cas.services.impl;
 
 import bbgon.irtsu_cas.dto.request.DetailProperties;
-import bbgon.irtsu_cas.dto.response.CustomSuccessResponse;
-import bbgon.irtsu_cas.dto.response.DetailResponse;
-import bbgon.irtsu_cas.dto.response.OwnerDTO;
-import bbgon.irtsu_cas.dto.response.PageableResponse;
+import bbgon.irtsu_cas.dto.response.*;
 import bbgon.irtsu_cas.entity.DetailsEntity;
 import bbgon.irtsu_cas.entity.QDetailsEntity;
 import bbgon.irtsu_cas.mappers.DetailMapper;
@@ -41,6 +38,27 @@ public class DetailsServiceImpl implements DetailsService {
     private final EntityManager entityManager;
 
     @Override
+    public List<TableElementResponse> getDetailsForAuthUser() {
+
+        UUID uuidAuthUser = userService.getUserIdByToken();
+
+        List<TableElementResponse> list = detailsRepository.findAll().stream()
+                .filter(detailsEntity -> detailsEntity.getOwner().getId().equals(uuidAuthUser)) // Оставляем только свои компоненты
+                .map(detailsEntity -> new TableElementResponse(
+                        detailsEntity.getId(),
+                        detailsEntity.getName(),
+                        detailsEntity.getDescription(),
+                        detailsEntity.getStatus(),
+                        detailsEntity.getOwner().getName() + " " + detailsEntity.getOwner().getLastName(),
+                        detailsEntity.getOwner().getAvatar(),
+                        detailsEntity.getTenant()
+                ))
+                .toList();
+
+        return list;
+    }
+
+    @Override
     public CustomSuccessResponse<String> createDetail(DetailProperties detailProperties) {
         DetailsEntity detailsEntity = new DetailsEntity();
         detailsEntity.setCreatedDetail(LocalDateTime.now());
@@ -64,6 +82,8 @@ public class DetailsServiceImpl implements DetailsService {
 
         return new CustomSuccessResponse<>(new PageableResponse<>(mapDetails(detailsEntityPage), detailsEntityPage.getTotalElements()));
     }
+
+
 
     @Override
     public CustomSuccessResponse<String> deleteListDetails(List<UUID> uuidList) {

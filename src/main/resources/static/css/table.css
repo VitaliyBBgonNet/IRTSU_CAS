@@ -1,0 +1,10 @@
+.shortened-id {
+    width: 50px;
+    display: inline-block;
+    max-width: 10ch; /* Ограничение по ширине (5 символов) */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    mask-image: linear-gradient(90deg, rgba(0, 0, 0, 1) 50%, rgba(0, 0, 0, 0) 100%);
+    -webkit-mask-image: linear-gradient(90deg, rgba(0, 0, 0, 1) 50%, rgba(0, 0, 0, 0) 100%);
+}

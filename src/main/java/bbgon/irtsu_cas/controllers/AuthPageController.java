@@ -40,6 +40,7 @@ public class AuthPageController {
 
     @PostMapping("/profile")
     public String profileContent(Model model) {
+
         model.addAttribute("components", resourceService.listAllElements());
         return "profile";
     }

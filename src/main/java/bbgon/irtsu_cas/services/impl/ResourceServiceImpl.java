@@ -52,6 +52,7 @@ public class ResourceServiceImpl implements ResourceService {
         return detailsRepository.findAll().stream()
                 .map((detailsEntity) -> {
                     return new TableElementResponse(
+                            detailsEntity.getId(),
                             detailsEntity.getName(),
                             detailsEntity.getDescription(),
                             detailsEntity.getStatus(),
@@ -86,6 +87,7 @@ public class ResourceServiceImpl implements ResourceService {
         List<TableElementResponse> detailResponseList = result.getContent().stream()
                 .map(entity -> {
                     return new TableElementResponse(
+                            entity.getId(),
                             entity.getName(),
                             entity.getDescription(),
                             entity.getStatus(),

@@ -5,12 +5,14 @@ import bbgon.irtsu_cas.dto.request.DetailProperties;
 import bbgon.irtsu_cas.dto.response.CustomSuccessResponse;
 import bbgon.irtsu_cas.dto.response.DetailResponse;
 import bbgon.irtsu_cas.dto.response.PageableResponse;
+import bbgon.irtsu_cas.dto.response.TableElementResponse;
 import bbgon.irtsu_cas.services.DetailsService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,6 +32,13 @@ public class DetailsController {
             @RequestBody
             @Valid DetailProperties detail) {
         return ResponseEntity.ok(detailsService.createDetail(detail));
+    }
+
+    @GetMapping("/getAllDetailsForAuthUser")
+    public ResponseEntity<List<TableElementResponse>> getAllDetailsForAuthUser(){
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_TYPE, "application/json")
+                .body(detailsService.getDetailsForAuthUser());
     }
 
     @GetMapping("/all")
