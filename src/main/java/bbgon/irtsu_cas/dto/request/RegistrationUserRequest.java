@@ -29,4 +29,6 @@ public class RegistrationUserRequest {
     @Size(min = 3, max = 25, message = ValidationConstants.PASSWORD_NOT_VALID)
     @NotBlank(message = ValidationConstants.USER_PASSWORD_NULL)
     private String password;
+
+    private String phone;
 }

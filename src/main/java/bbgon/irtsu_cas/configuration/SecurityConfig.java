@@ -30,6 +30,7 @@ public class SecurityConfig {
                         .requestMatchers("/docs").permitAll()
                         .requestMatchers("/IRTSU/**").permitAll()
                         .requestMatchers("/authUser/login").permitAll()
+                        .requestMatchers("/authUser/registration").permitAll()
                         .requestMatchers("/home").permitAll()
                         .requestMatchers("/authUser/profile").permitAll()
                         .requestMatchers("/details/all").permitAll()
