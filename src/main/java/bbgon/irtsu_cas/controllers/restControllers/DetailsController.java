@@ -97,8 +97,6 @@ public class DetailsController {
         return ResponseEntity.ok(detailsService.deleteListDetails(uuidList));
     }
 
-
-
     @GetMapping("/getDetailWitchFilter")
     public ResponseEntity<CustomSuccessResponse<PageableResponse<List<DetailResponse>>>> getDetails(
             @RequestParam(defaultValue = "0") Integer page,

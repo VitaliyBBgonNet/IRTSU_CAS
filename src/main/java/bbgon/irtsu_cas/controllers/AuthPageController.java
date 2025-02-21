@@ -1,15 +1,9 @@
 package bbgon.irtsu_cas.controllers;
 
 import bbgon.irtsu_cas.dto.request.AuthUserRequest;
-import bbgon.irtsu_cas.entity.UsersEntity;
-import bbgon.irtsu_cas.services.AuthService;
-import bbgon.irtsu_cas.services.UserService;
+import bbgon.irtsu_cas.dto.request.RegistrationUserRequest;
 import bbgon.irtsu_cas.services.impl.ResourceService;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,11 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequiredArgsConstructor
 public class AuthPageController {
     private final ResourceService resourceService;
-
-
-    private final AuthService authService;
-
-    private final UserService userService;
 
     @GetMapping("/login")
     public String loginPage(Model model) {
@@ -43,5 +32,11 @@ public class AuthPageController {
 
         model.addAttribute("components", resourceService.listAllElements());
         return "profile";
+    }
+
+    @GetMapping("/registration")
+    public String registration(Model model) {
+        model.addAttribute("registerForm", new RegistrationUserRequest());
+        return "registration-user";
     }
 }
