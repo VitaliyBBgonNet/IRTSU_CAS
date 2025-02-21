@@ -30,5 +30,6 @@ public class RegistrationUserRequest {
     @NotBlank(message = ValidationConstants.USER_PASSWORD_NULL)
     private String password;
 
+    @NotBlank(message = ValidationConstants.USER_PASSWORD_NOT_VALID)
     private String phone;
 }

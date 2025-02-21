@@ -42,6 +42,7 @@ public class AuthServiceImpl implements AuthService {
         usersEntity.setName(requestForRegistration.getName());
         usersEntity.setLastName(requestForRegistration.getLastName());
         usersEntity.setSurname(requestForRegistration.getSurname());
+        usersEntity.setPhone(requestForRegistration.getPhone());
 
         authRepository.save(usersEntity);
 

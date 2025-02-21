@@ -97,7 +97,7 @@
                 />
             </div>
             <button type="submit" class="login-button">Регистрация</button>
-            <a class="me-3 py-2 link-body-emphasis text-decoration-none" href="/authUser/login">Login</a>
+            <a class="link-secondary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover" href="/authUser/login">Login</a>
         </form>
 
 
@@ -106,6 +106,54 @@
 
 <!-- Секция для обработки ответа сервера (токен) -->
 <div id="response"></div>
+<script>
+    document.querySelector(".login-form").addEventListener("submit", function(event) {
+        event.preventDefault(); // Остановить отправку формы, если есть ошибки
+
+        let email = document.getElementById("email").value.trim();
+        let name = document.getElementById("name").value.trim();
+        let lastName = document.getElementById("lastName").value.trim();
+        let surname = document.getElementById("surname").value.trim();
+        let phone = document.getElementById("phone").value.trim();
+        let password = document.getElementById("password").value;
+
+        let errors = [];
+
+        // Проверка Email
+        let emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            errors.push("Введите корректный email.");
+        }
+
+        // Проверка имени и фамилии (только буквы)
+        let nameRegex = /^[А-Яа-яЁёA-Za-z]+$/;
+        if (!nameRegex.test(name)) {
+            errors.push("Имя должно содержать только буквы.");
+        }
+        if (!nameRegex.test(lastName)) {
+            errors.push("Фамилия должна содержать только буквы.");
+        }
+
+        // Проверка номера телефона (пример: +7(999)999-99-99)
+        let phoneRegex = /^\+?\d{1,3}?[-.\s]?\(?\d{1,4}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,9}$/;
+        if (!phoneRegex.test(phone)) {
+            errors.push("Введите корректный номер телефона.");
+        }
+
+        // Проверка пароля (минимум 6 символов)
+        if (password.length < 6) {
+            errors.push("Пароль должен содержать минимум 6 символов.");
+        }
+
+        // Вывод ошибок
+        if (errors.length > 0) {
+            alert(errors.join("\n"));
+            return;
+        }
+
+        event.target.submit(); // Если ошибок нет — отправляем форму
+    });
+</script>
 
 <script>
     document.body.addEventListener('htmx:afterRequest', function(event) {
@@ -131,5 +179,7 @@
         }
     });
 </script>
+
+
 </body>
 </html>
