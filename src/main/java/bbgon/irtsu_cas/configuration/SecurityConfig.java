@@ -27,6 +27,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/addNewDetail").permitAll()
+                        .requestMatchers("/admin/newUsersPage").permitAll()
                         .requestMatchers("/docs").permitAll()
                         .requestMatchers("/IRTSU/**").permitAll()
                         .requestMatchers("/authUser/login").permitAll()
