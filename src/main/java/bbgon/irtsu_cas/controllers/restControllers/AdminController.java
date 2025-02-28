@@ -1,5 +1,6 @@
 package bbgon.irtsu_cas.controllers.restControllers;
 
+import bbgon.irtsu_cas.dto.request.AddNewUserFromAdmin;
 import bbgon.irtsu_cas.dto.request.GroupEditDataRequest;
 import bbgon.irtsu_cas.dto.request.NewGroupRequest;
 import bbgon.irtsu_cas.dto.response.CustomSuccessResponse;
@@ -18,6 +19,13 @@ import java.util.UUID;
 public class AdminController {
 
     private final AdminService adminService;
+
+    @PostMapping("/createUser")
+    public ResponseEntity<CustomSuccessResponse<SuccessResponse>> createUser(
+            @RequestBody AddNewUserFromAdmin dataNewUserFromAdmin
+            ){
+        return ResponseEntity.ok(adminService.createNewUser(dataNewUserFromAdmin));
+    }
 
     @PostMapping("/createGroup")
     public ResponseEntity<CustomSuccessResponse<SuccessResponse>> createNewGroup(

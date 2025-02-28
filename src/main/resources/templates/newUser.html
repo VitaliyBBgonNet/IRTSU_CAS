@@ -120,10 +120,11 @@
                 name: document.getElementById("userName").value,
                 surname: document.getElementById("sureName").value,
                 email: document.getElementById("userEmail").value,
-                password: document.getElementById("userPassword").value
+                password: document.getElementById("userPassword").value,
+                phoneNumber: document.getElementById("userPhone").value
             };
 
-            fetch("/user/newUsers", {
+            fetch("/admin/createUser", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

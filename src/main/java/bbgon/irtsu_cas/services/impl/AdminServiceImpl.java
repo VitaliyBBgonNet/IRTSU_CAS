@@ -2,13 +2,16 @@ package bbgon.irtsu_cas.services.impl;
 
 import bbgon.irtsu_cas.CustomException;
 import bbgon.irtsu_cas.constants.ErrorCodes;
+import bbgon.irtsu_cas.dto.request.AddNewUserFromAdmin;
 import bbgon.irtsu_cas.dto.request.GroupEditDataRequest;
 import bbgon.irtsu_cas.dto.request.NewGroupRequest;
 import bbgon.irtsu_cas.dto.response.CustomSuccessResponse;
+import bbgon.irtsu_cas.dto.response.LoginUserResponse;
 import bbgon.irtsu_cas.dto.response.SuccessResponse;
 import bbgon.irtsu_cas.entity.DetailsEntity;
 import bbgon.irtsu_cas.entity.GroupEntity;
 import bbgon.irtsu_cas.entity.UsersEntity;
+import bbgon.irtsu_cas.repositories.AuthRepository;
 import bbgon.irtsu_cas.repositories.DetailsRepository;
 import bbgon.irtsu_cas.repositories.GroupRepository;
 import bbgon.irtsu_cas.repositories.UserRepository;
@@ -16,6 +19,7 @@ import bbgon.irtsu_cas.services.AdminService;
 import bbgon.irtsu_cas.services.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -32,6 +36,33 @@ public class AdminServiceImpl implements AdminService {
     private final DetailsRepository detailsRepository;
 
     private final UserService userService;
+
+    private final AuthRepository authRepository;
+
+    private final PasswordEncoder passwordEncoder;
+
+    @Override
+    public CustomSuccessResponse<SuccessResponse> createNewUser(AddNewUserFromAdmin addNewUserFromAdmin) {
+
+        authRepository.findByEmail(addNewUserFromAdmin.getEmail()).ifPresent(auth -> {
+            throw new CustomException(ErrorCodes.USER_ALREADY_EXISTS);
+        });
+
+        String encryptedPassword = passwordEncoder.encode(addNewUserFromAdmin.getPassword());
+
+        UsersEntity usersEntity = new UsersEntity();
+        usersEntity.setEmail(addNewUserFromAdmin.getEmail());
+        usersEntity.setPassword(encryptedPassword);
+        usersEntity.setName(addNewUserFromAdmin.getName());
+        usersEntity.setLastName(addNewUserFromAdmin.getLastName());
+        usersEntity.setSurname(addNewUserFromAdmin.getSurName());
+        usersEntity.setPhone(addNewUserFromAdmin.getPhoneNumber());
+
+        authRepository.save(usersEntity);
+
+        return new CustomSuccessResponse<>(new SuccessResponse());
+    }
+    
 
     @Override
     public CustomSuccessResponse<SuccessResponse> createNewGroup(NewGroupRequest newGroupRequest) {
