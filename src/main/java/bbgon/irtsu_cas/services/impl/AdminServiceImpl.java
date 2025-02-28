@@ -8,6 +8,7 @@ import bbgon.irtsu_cas.dto.request.NewGroupRequest;
 import bbgon.irtsu_cas.dto.response.CustomSuccessResponse;
 import bbgon.irtsu_cas.dto.response.LoginUserResponse;
 import bbgon.irtsu_cas.dto.response.SuccessResponse;
+import bbgon.irtsu_cas.dto.response.Users;
 import bbgon.irtsu_cas.entity.DetailsEntity;
 import bbgon.irtsu_cas.entity.GroupEntity;
 import bbgon.irtsu_cas.entity.UsersEntity;
@@ -17,12 +18,15 @@ import bbgon.irtsu_cas.repositories.GroupRepository;
 import bbgon.irtsu_cas.repositories.UserRepository;
 import bbgon.irtsu_cas.services.AdminService;
 import bbgon.irtsu_cas.services.UserService;
+import bbgon.irtsu_cas.utils.AESUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +41,9 @@ public class AdminServiceImpl implements AdminService {
     private final AuthRepository authRepository;
 
     private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+
+    private final AESUtil aesUtil;
 
     @Override
     public CustomSuccessResponse<SuccessResponse> createNewUser(AddNewUserFromAdmin addNewUserFromAdmin) {
@@ -51,20 +58,42 @@ public class AdminServiceImpl implements AdminService {
             throw new CustomException(ErrorCodes.USER_ALREADY_EXISTS);
         }
 
-        String encryptedPassword = passwordEncoder.encode(addNewUserFromAdmin.getPassword());
+        String password = aesUtil.encrypt(addNewUserFromAdmin.getPassword());
 
         UsersEntity usersEntity = new UsersEntity();
         usersEntity.setEmail(addNewUserFromAdmin.getEmail());
-        usersEntity.setPassword(encryptedPassword);
+        usersEntity.setPassword(password);
         usersEntity.setName(addNewUserFromAdmin.getName());
         usersEntity.setLastName(addNewUserFromAdmin.getLastName());
         usersEntity.setSurname(addNewUserFromAdmin.getSurName());
         usersEntity.setPhone(addNewUserFromAdmin.getPhoneNumber());
         usersEntity.setRole("Teacher");// перенести в константы
+        usersEntity.setAddInformation(addNewUserFromAdmin.getAddInformation());
 
         authRepository.save(usersEntity);
 
         return new CustomSuccessResponse<>(new SuccessResponse());
+    }
+
+    @Override
+    public List<Users> getAllUsersForAdmin() {
+
+
+
+        List<UsersEntity> usersEntities = userRepository.findAll();
+
+        Stream<Users> usersStream = usersEntities.stream().map(usersEntity -> {
+            return new Users(
+                    usersEntity.getId().toString(),
+                    usersEntity.getLastName() + " " + usersEntity.getName() + " " + usersEntity.getSurname(),
+                    usersEntity.getEmail(),
+                    aesUtil.decrypt(usersEntity.getPassword()),
+                    usersEntity.getPhone(),
+                    usersEntity.getAddInformation()
+            );
+        });
+
+        return usersStream.collect(Collectors.toList());
     }
 
 

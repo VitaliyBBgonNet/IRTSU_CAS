@@ -32,4 +32,6 @@ public class AddNewUserFromAdmin {
 
     @NotBlank(message = ValidationConstants.USERNAME_SIZE_NOT_VALID) // изменить валидацию
     String phoneNumber;
+
+    String addInformation;
 }

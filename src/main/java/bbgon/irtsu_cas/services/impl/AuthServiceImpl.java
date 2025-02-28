@@ -10,6 +10,7 @@ import bbgon.irtsu_cas.entity.UsersEntity;
 import bbgon.irtsu_cas.repositories.AuthRepository;
 import bbgon.irtsu_cas.security.TokenSecurity;
 import bbgon.irtsu_cas.services.AuthService;
+import bbgon.irtsu_cas.utils.AESUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -25,6 +26,8 @@ public class AuthServiceImpl implements AuthService {
 
     private final TokenSecurity jwtToken;
 
+    private final AESUtil aesUtil;
+
     @Override
     public CustomSuccessResponse<LoginUserResponse> registrationUser(RegistrationUserRequest requestForRegistration) {
 
@@ -32,12 +35,12 @@ public class AuthServiceImpl implements AuthService {
             throw new CustomException(ErrorCodes.USER_ALREADY_EXISTS);
         });
 
-        String encryptedPassword = passwordEncoder.encode(requestForRegistration.getPassword());
+        String passwordEncrypt = aesUtil.encrypt(requestForRegistration.getPassword());
 
         //Потом переделать через маппер
         UsersEntity usersEntity = new UsersEntity();
         usersEntity.setEmail(requestForRegistration.getEmail());
-        usersEntity.setPassword(encryptedPassword);
+        usersEntity.setPassword(passwordEncrypt);
         usersEntity.setCreatedAccount(LocalDateTime.now());
         usersEntity.setName(requestForRegistration.getName());
         usersEntity.setLastName(requestForRegistration.getLastName());
@@ -59,7 +62,7 @@ public class AuthServiceImpl implements AuthService {
         UsersEntity usersEntity = authRepository.findByEmail(requestForAuthorization.getEmail())
                 .orElseThrow(() -> new CustomException(ErrorCodes.USER_NOT_FOUND));
 
-        if (!passwordEncoder.matches(requestForAuthorization.getPassword(), usersEntity.getPassword())) {
+        if (!aesUtil.decrypt(requestForAuthorization.getPassword()).equals(aesUtil.encrypt(usersEntity.getPassword()))) {
             throw new CustomException(ErrorCodes.USER_PASSWORD_NOT_VALID);
         }
 

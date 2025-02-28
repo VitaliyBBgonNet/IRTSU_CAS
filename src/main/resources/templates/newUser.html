@@ -83,6 +83,27 @@
             </div>
         </div>
     </form>
+    <br>
+
+    <div class="col">
+        <table class="table table-sm table-hover">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>ФИО</th>
+                <th>Email</th>
+                <th>Пароль</th>
+                <th>Телефон</th>
+                <th>Доп.Информация</th>
+            </tr>
+            </thead>
+            <tbody id="componentListBody">
+            </tbody>
+        </table>
+
+    </div>
+
+
 
     <!-- Модальное окно успеха -->
     <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
@@ -103,6 +124,7 @@
     </div>
 </div>
 
+
 <!-- Сценарии -->
 <script src="https://unpkg.com/htmx.org@1.8.4"></script>
 <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
@@ -110,6 +132,35 @@
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const form = document.getElementById("userForm");
+
+        function loadUsers() {
+            fetch("/admin/getUsers", {
+                method: "GET",
+                headers: {
+                    "Authorization": "Bearer " + localStorage.getItem("token")
+                }
+            })
+                .then(response => response.json())
+                .then(users => {
+                    const tbody = document.getElementById("componentListBody");
+                    tbody.innerHTML = '';  // Очищаем текущую таблицу
+                    users.forEach(user => {
+                        const row = document.createElement("tr");
+                        row.innerHTML = `
+                            <td>${user.id}</td>
+                            <td>${user.lastName} ${user.name}</td>
+                            <td>${user.email}</td>
+                            <td>${user.password}</td>
+                            <td>${user.phone}</td>
+                            <td>${user.addInformation}</td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                })
+                .catch(error => console.error('Error loading users:', error));
+        }
+
+        loadUsers();
 
         form.addEventListener("submit", function (event) {
             event.preventDefault(); // Предотвращаем стандартную отправку формы
@@ -121,7 +172,8 @@
                 surname: document.getElementById("sureName").value,
                 email: document.getElementById("userEmail").value,
                 password: document.getElementById("userPassword").value,
-                phoneNumber: document.getElementById("userPhone").value
+                phoneNumber: document.getElementById("userPhone").value,
+                addInformation: document.getElementById("addInformation").value
             };
 
             fetch("/admin/createUser", {
@@ -133,12 +185,15 @@
                 body: JSON.stringify(userData)
             })
                 .then(response => {
-                    if (!response.ok) throw new Error("Ошибка при создании пользователя");
                     return response.json();
                 })
                 .then(data => {
-                    const modal = new bootstrap.Modal(document.getElementById("successModal"));
-                    modal.show();
+                    if (data.statusCode === 30) {
+                        alert("Такой пользователь уже существует!");
+                    } else {
+                        const modal = new bootstrap.Modal(document.getElementById("successModal"));
+                        modal.show();
+                    }
                 })
                 .catch(error => {
                     console.error("Ошибка:", error);

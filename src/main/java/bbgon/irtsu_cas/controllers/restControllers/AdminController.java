@@ -6,11 +6,15 @@ import bbgon.irtsu_cas.dto.request.NewGroupRequest;
 import bbgon.irtsu_cas.dto.response.CustomSuccessResponse;
 import bbgon.irtsu_cas.dto.response.SuccessResponse;
 
+import bbgon.irtsu_cas.dto.response.Users;
 import bbgon.irtsu_cas.services.AdminService;
+import bbgon.irtsu_cas.services.UserService;
+import bbgon.irtsu_cas.services.impl.ResourceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -19,6 +23,13 @@ import java.util.UUID;
 public class AdminController {
 
     private final AdminService adminService;
+    private final ResourceService resourceService;
+    private final UserService userService;
+
+    @GetMapping("/getUsers")
+    public ResponseEntity<List<Users>> getUsers() {
+        return ResponseEntity.ok(adminService.getAllUsersForAdmin());
+    }
 
     @PostMapping("/createUser")
     public ResponseEntity<CustomSuccessResponse<SuccessResponse>> createUser(
