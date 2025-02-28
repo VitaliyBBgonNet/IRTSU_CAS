@@ -27,6 +27,7 @@ public class UsersEntity {
     private String avatar;
     private String phone;
     private String department;
+    private String role;
 
     @OneToMany(mappedBy = "admin", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<GroupEntity> ownGroups;

@@ -22,10 +22,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -44,9 +41,15 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public CustomSuccessResponse<SuccessResponse> createNewUser(AddNewUserFromAdmin addNewUserFromAdmin) {
 
-        authRepository.findByEmail(addNewUserFromAdmin.getEmail()).ifPresent(auth -> {
+        UsersEntity thisUser = userService.findUserEntityById(userService.getUserIdByToken());
+
+        if (!"Admin".equalsIgnoreCase(thisUser.getRole())) {
+            throw new CustomException(ErrorCodes.ACCESS_DENIED);
+        }
+
+        if (authRepository.findByEmail(addNewUserFromAdmin.getEmail()).isPresent()) {
             throw new CustomException(ErrorCodes.USER_ALREADY_EXISTS);
-        });
+        }
 
         String encryptedPassword = passwordEncoder.encode(addNewUserFromAdmin.getPassword());
 
@@ -57,12 +60,13 @@ public class AdminServiceImpl implements AdminService {
         usersEntity.setLastName(addNewUserFromAdmin.getLastName());
         usersEntity.setSurname(addNewUserFromAdmin.getSurName());
         usersEntity.setPhone(addNewUserFromAdmin.getPhoneNumber());
+        usersEntity.setRole("Teacher");// перенести в константы
 
         authRepository.save(usersEntity);
 
         return new CustomSuccessResponse<>(new SuccessResponse());
     }
-    
+
 
     @Override
     public CustomSuccessResponse<SuccessResponse> createNewGroup(NewGroupRequest newGroupRequest) {
