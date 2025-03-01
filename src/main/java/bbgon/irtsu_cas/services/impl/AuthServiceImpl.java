@@ -62,7 +62,9 @@ public class AuthServiceImpl implements AuthService {
         UsersEntity usersEntity = authRepository.findByEmail(requestForAuthorization.getEmail())
                 .orElseThrow(() -> new CustomException(ErrorCodes.USER_NOT_FOUND));
 
-        if (!aesUtil.decrypt(requestForAuthorization.getPassword()).equals(aesUtil.encrypt(usersEntity.getPassword()))) {
+        String decryptedPassword = aesUtil.decrypt(usersEntity.getPassword());
+
+        if (!requestForAuthorization.getPassword().equals(decryptedPassword)) {
             throw new CustomException(ErrorCodes.USER_PASSWORD_NOT_VALID);
         }
 
@@ -70,4 +72,5 @@ public class AuthServiceImpl implements AuthService {
         loginUserResponse.setToken(jwtToken.generateToken(usersEntity.getId()));
         return new CustomSuccessResponse<>(loginUserResponse);
     }
+
 }
