@@ -72,5 +72,4 @@ public class AuthServiceImpl implements AuthService {
         loginUserResponse.setToken(jwtToken.generateToken(usersEntity.getId()));
         return new CustomSuccessResponse<>(loginUserResponse);
     }
-
 }

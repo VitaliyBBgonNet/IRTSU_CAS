@@ -142,6 +142,11 @@
             })
                 .then(response => response.json())
                 .then(users => {
+
+                    if (users.statusCode === 48){
+                        window.location.replace("/authUser/profile");
+                    }
+
                     const tbody = document.getElementById("componentListBody");
                     tbody.innerHTML = '';  // Очищаем текущую таблицу
                     users.forEach(user => {
@@ -190,7 +195,13 @@
                 .then(data => {
                     if (data.statusCode === 30) {
                         alert("Такой пользователь уже существует!");
-                    } else {
+                    }
+
+                    if (data.statusCode === 48){
+                        alert("Недостаточно прав!");
+                    }
+
+                    else {
                         const modal = new bootstrap.Modal(document.getElementById("successModal"));
                         modal.show();
                     }

@@ -78,7 +78,11 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public List<Users> getAllUsersForAdmin() {
 
+        UsersEntity thisUser = userService.findUserEntityById(userService.getUserIdByToken());
 
+        if (!"Admin".equalsIgnoreCase(thisUser.getRole())) {
+            throw new CustomException(ErrorCodes.ACCESS_DENIED);
+        }
 
         List<UsersEntity> usersEntities = userRepository.findAll();
 
