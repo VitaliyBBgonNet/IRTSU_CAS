@@ -1,83 +1,78 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile</title>
+
+    <!-- Стили -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/css/table.css" type="text/css">
+    <link rel="stylesheet" th:href="@{/css/table.css}" type="text/css">
 </head>
+
 <body>
-<div class="container py-3"><div th:replace="~{header.html :: header}"></div></div>
+<div class="container py-3">
+    <div th:replace="~{header.html :: header}"></div>
+</div>
 
 <div class="container py-3" style="max-width: 800px;">
-
-
+    <!-- Аватар -->
     <div class="text-center">
-        <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
+        <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" class="bi bi-person-circle"
+             viewBox="0 0 16 16">
             <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
-            <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>
+            <path fill-rule="evenodd"
+                  d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>
         </svg>
     </div>
 
+    <!-- Данные профиля -->
     <div class="text-center">
         <p id="full-name" hx-get="/data/profile" hx-trigger="load" hx-target="#full-name" hx-swap="innerHTML">
             Загрузка...
         </p>
     </div>
 
+    <!-- Форма пользователя -->
     <form id="userForm">
         <div class="container">
             <div class="row">
                 <div class="col-sm">
-                    <div class="form-group">
-                        <label for="userLastName">Фамилия</label>
-                        <input type="text" class="form-control" id="userLastName" name="userLastName">
-                    </div>
+                    <label for="userLastName">Фамилия</label>
+                    <input type="text" class="form-control" id="userLastName" name="userLastName">
                 </div>
                 <div class="col-sm">
-                    <div class="form-group">
-                        <label for="userEmail">Email</label>
-                        <input type="email" class="form-control" id="userEmail" name="userEmail">
-                    </div>
+                    <label for="userEmail">Email</label>
+                    <input type="email" class="form-control" id="userEmail" name="userEmail">
                 </div>
             </div>
             <br>
             <div class="row">
                 <div class="col-sm">
-                    <div class="form-group">
-                        <label for="userName">Имя</label>
-                        <input type="text" class="form-control" id="userName" name="userName">
-                    </div>
+                    <label for="userName">Имя</label>
+                    <input type="text" class="form-control" id="userName" name="userName">
                 </div>
                 <div class="col-sm">
-                    <div class="form-group">
-                        <label for="userPassword">Пароль</label>
-                        <input type="password" class="form-control" id="userPassword" name="userPassword">
-                    </div>
+                    <label for="userPassword">Пароль</label>
+                    <input type="password" class="form-control" id="userPassword" name="userPassword">
                 </div>
             </div>
             <br>
             <div class="row">
                 <div class="col-sm">
-                    <div class="form-group">
-                        <label for="sureName">Отчество</label>
-                        <input type="text" class="form-control" id="sureName" name="sureName">
-                    </div>
+                    <label for="sureName">Отчество</label>
+                    <input type="text" class="form-control" id="sureName" name="sureName">
                 </div>
                 <div class="col-sm">
-                    <div class="form-group">
-                        <label for="userPhone">Телефон</label>
-                        <input type="text" class="form-control" id="userPhone" name="userPhone">
-                    </div>
+                    <label for="userPhone">Телефон</label>
+                    <input type="text" class="form-control" id="userPhone" name="userPhone">
                 </div>
             </div>
             <br>
             <div class="row">
-                <div class="form-group">
-                    <label for="addInformation">Дополнительная информация</label>
-                    <textarea class="form-control" id="addInformation" rows="3"></textarea>
-                </div>
+                <label for="addInformation">Дополнительная информация</label>
+                <textarea class="form-control" id="addInformation" rows="3"></textarea>
             </div>
             <br>
             <div class="d-flex justify-content-center">
@@ -87,92 +82,48 @@
     </form>
     <br>
 
-    <div class="col">
-        <table class="table table-sm table-hover">
-            <thead>
-            <tr>
-                <th>ID</th>
-                <th>ФИО</th>
-                <th>Email</th>
-                <th>Пароль</th>
-                <th>Телефон</th>
-                <th>Доп.Информация</th>
-            </tr>
-            </thead>
-            <tbody id="componentListBody">
-            </tbody>
-        </table>
-
-    </div>
-
-
+    <!-- Таблица пользователей -->
+    <table class="table table-sm table-hover">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>ФИО</th>
+            <th>Email</th>
+            <th>Пароль</th>
+            <th>Телефон</th>
+            <th>Доп.Информация</th>
+            <th>Действие</th>
+        </tr>
+        </thead>
+        <tbody id="componentListBody"></tbody>
+    </table>
 
     <!-- Модальное окно успеха -->
-    <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+    <div class="modal fade" id="successModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="successModalLabel">Успех!</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                    <h5 class="modal-title">Успех!</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body">
-                    Пользователь успешно добавлен!
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">ОК</button>
-                </div>
+                <div class="modal-body">Пользователь успешно добавлен!</div>
             </div>
         </div>
     </div>
 </div>
 
-
-<!-- Сценарии -->
+<!-- Подключение скриптов -->
 <script src="https://unpkg.com/htmx.org@1.8.4"></script>
 <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        const form = document.getElementById("userForm");
-
-        function loadUsers() {
-            fetch("/admin/getUsers", {
-                method: "GET",
-                headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("token")
-                }
-            })
-                .then(response => response.json())
-                .then(users => {
-
-                    if (users.statusCode === 48){
-                        window.location.replace("/authUser/profile");
-                    }
-
-                    const tbody = document.getElementById("componentListBody");
-                    tbody.innerHTML = '';  // Очищаем текущую таблицу
-                    users.forEach(user => {
-                        const row = document.createElement("tr");
-                        row.innerHTML = `
-                            <td>${user.id}</td>
-                            <td>${user.lastName} ${user.name}</td>
-                            <td>${user.email}</td>
-                            <td>${user.password}</td>
-                            <td>${user.phone}</td>
-                            <td>${user.addInformation}</td>
-                        `;
-                        tbody.appendChild(row);
-                    });
-                })
-                .catch(error => console.error('Error loading users:', error));
-        }
-
         loadUsers();
 
-        form.addEventListener("submit", function (event) {
-            event.preventDefault(); // Предотвращаем стандартную отправку формы
+        document.getElementById("userForm").addEventListener("submit", function (event) {
+            event.preventDefault();
 
-            let token = localStorage.getItem("token");
             let userData = {
                 lastName: document.getElementById("userLastName").value,
                 name: document.getElementById("userName").value,
@@ -187,47 +138,68 @@
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": token ? "Bearer " + token : ""
+                    "Authorization": "Bearer " + localStorage.getItem("token")
                 },
                 body: JSON.stringify(userData)
             })
-                .then(response => {
-                    return response.json();
-                })
+                .then(response => response.json())
                 .then(data => {
-                    if (data.statusCode === 30) {
-                        alert("Такой пользователь уже существует!");
-                    }
-
-                    if (data.statusCode === 48){
-                        alert("Недостаточно прав!");
-                    }
-
-                    else {
-                        const modal = new bootstrap.Modal(document.getElementById("successModal"));
-                        modal.show();
-                    }
+                    if (data.statusCode === 30) return alert("Такой пользователь уже существует!");
+                    if (data.statusCode === 48) return alert("Недостаточно прав!");
+                    new bootstrap.Modal(document.getElementById("successModal")).show();
+                    loadUsers();
                 })
-                .catch(error => {
-                    console.error("Ошибка:", error);
-                    alert("Что-то пошло не так. Попробуйте позже.");
-                });
+                .catch(console.error);
+        });
+
+        document.getElementById("componentListBody").addEventListener("click", function (event) {
+            const button = event.target.closest(".delete-btn");
+            if (!button) return;
+
+            const itemId = button.dataset.id;
+            if (!confirm(`Удалить пользователя с ID ${itemId}?`)) return;
+
+            fetch(`/admin/deleteThisUser`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + localStorage.getItem("token")
+                },
+                body: JSON.stringify({ id: itemId })
+            })
+                .then(response => response.json())
+                .then(() => {
+                    alert("Пользователь удалён!");
+                    loadUsers();
+                })
+                .catch(console.error);
         });
     });
 
-    // Настройка HTMX
-    document.addEventListener("htmx:configRequest", function(event) {
-        let token = localStorage.getItem("token");
-        if (token) {
-            event.detail.headers['Authorization'] = 'Bearer ' + token;
-        }
-    });
-
-    document.body.addEventListener("htmx:responseError", function (event) {
-        if (event.detail.xhr.status === 401) {
-            window.location.href = "/authUser/login";
-        }
-    });
+    function loadUsers() {
+        fetch("/admin/getUsers", {
+            method: "GET",
+            headers: { "Authorization": "Bearer " + localStorage.getItem("token") }
+        })
+            .then(response => response.json())
+            .then(users => {
+                if (users.statusCode === 48) return window.location.replace("/authUser/profile");
+                document.getElementById("componentListBody").innerHTML = users.map(user => `
+                    <tr>
+                        <td><p class="shortened-id">${user.id}</p></td>
+                        <td>${user.fio}</td>
+                        <td>${user.email}</td>
+                        <td>${user.password}</td>
+                        <td>${user.phone}</td>
+                        <td>${user.addInformation}</td>
+                        <td><button class="btn btn-danger btn-sm delete-btn" data-id="${user.id}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
+  <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"></path>
+</svg></button></td>
+                    </tr>`).join("");
+            })
+            .catch(console.error);
+    }
 </script>
+
 </body>
 </html>

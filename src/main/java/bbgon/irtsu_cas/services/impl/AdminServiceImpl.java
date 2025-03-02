@@ -100,6 +100,18 @@ public class AdminServiceImpl implements AdminService {
         return usersStream.collect(Collectors.toList());
     }
 
+    @Override
+    public CustomSuccessResponse<SuccessResponse> deleteUserById(String id) {
+
+        UUID userId = UUID.fromString(id);
+        UsersEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCodes.USER_NOT_FOUND));
+
+        userRepository.delete(user);
+
+        return new CustomSuccessResponse<>(new SuccessResponse("User deleted successfully"));
+    }
+
 
     @Override
     public CustomSuccessResponse<SuccessResponse> createNewGroup(NewGroupRequest newGroupRequest) {

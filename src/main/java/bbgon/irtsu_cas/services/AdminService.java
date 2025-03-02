@@ -16,6 +16,8 @@ public interface AdminService {
 
     List<Users> getAllUsersForAdmin();
 
+    CustomSuccessResponse<SuccessResponse> deleteUserById(String id);
+
     CustomSuccessResponse<SuccessResponse> createNewGroup(NewGroupRequest newGroupRequest);
 
     CustomSuccessResponse<SuccessResponse> deleteGroup(UUID groupId, String groupName);

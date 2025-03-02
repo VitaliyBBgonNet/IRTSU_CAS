@@ -10,11 +10,13 @@ import bbgon.irtsu_cas.dto.response.Users;
 import bbgon.irtsu_cas.services.AdminService;
 import bbgon.irtsu_cas.services.UserService;
 import bbgon.irtsu_cas.services.impl.ResourceService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -33,9 +35,14 @@ public class AdminController {
 
     @PostMapping("/createUser")
     public ResponseEntity<CustomSuccessResponse<SuccessResponse>> createUser(
-            @RequestBody AddNewUserFromAdmin dataNewUserFromAdmin
+            @Valid @RequestBody AddNewUserFromAdmin dataNewUserFromAdmin
             ){
         return ResponseEntity.ok(adminService.createNewUser(dataNewUserFromAdmin));
+    }
+
+    @DeleteMapping("/deleteThisUser")
+    public ResponseEntity<CustomSuccessResponse<SuccessResponse>> deleteDetail(@RequestBody Map<String, UUID> requestBody) {
+        return ResponseEntity.ok(adminService.deleteUserById(requestBody.get("id").toString()));
     }
 
     @PostMapping("/createGroup")
