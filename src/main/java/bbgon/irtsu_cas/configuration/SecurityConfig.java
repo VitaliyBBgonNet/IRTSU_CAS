@@ -26,6 +26,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/docs").permitAll()
                         .requestMatchers("/addNewDetail").permitAll()
                         .requestMatchers("/admin/newUsersPage").permitAll()
                         .requestMatchers("/docs").permitAll()

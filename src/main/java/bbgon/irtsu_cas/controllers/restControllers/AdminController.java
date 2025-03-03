@@ -35,7 +35,7 @@ public class AdminController {
 
     @PostMapping("/createUser")
     public ResponseEntity<CustomSuccessResponse<SuccessResponse>> createUser(
-            @Valid @RequestBody AddNewUserFromAdmin dataNewUserFromAdmin
+            @RequestBody AddNewUserFromAdmin dataNewUserFromAdmin
             ){
         return ResponseEntity.ok(adminService.createNewUser(dataNewUserFromAdmin));
     }
