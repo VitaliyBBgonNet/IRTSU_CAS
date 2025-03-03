@@ -116,6 +116,46 @@
     </div>
 </div>
 
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Редактирование пользователя</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Форма для редактирования -->
+                <form id="editUserForm">
+                    <div class="mb-3">
+                        <label for="editFio" class="form-label">ФИО</label>
+                        <input type="text" class="form-control" id="editFio" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editEmail" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="editEmail" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editPassword" class="form-label">Пароль</label>
+                        <input type="password" class="form-control" id="editPassword">
+                    </div>
+                    <div class="mb-3">
+                        <label for="editPhone" class="form-label">Телефон</label>
+                        <input type="text" class="form-control" id="editPhone">
+                    </div>
+                    <div class="mb-3">
+                        <label for="editAddInformation" class="form-label">Дополнительная информация</label>
+                        <textarea class="form-control" id="editAddInformation"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                <button type="button" class="btn btn-primary" id="saveChanges">Сохранить изменения</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Подключение скриптов -->
 <script src="https://unpkg.com/htmx.org@1.8.4"></script>
 <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
@@ -157,26 +197,54 @@
         });
 
         document.getElementById("componentListBody").addEventListener("click", function (event) {
-            const button = event.target.closest(".delete-btn");
-            if (!button) return;
+            const button = event.target.closest(".btn-danger");
+            const buttonEdit = event.target.closest(".btn-secondary")
 
-            const itemId = button.dataset.id;
-            if (!confirm(`Удалить пользователя с ID ${itemId}?`)) return;
+            if(button){
+                const itemId = button.dataset.id;
+                if (!confirm(`Удалить пользователя с ID ${itemId}?`)) return;
 
-            fetch(`/admin/deleteThisUser`, {
-                method: "DELETE",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": "Bearer " + localStorage.getItem("token")
-                },
-                body: JSON.stringify({ id: itemId })
-            })
-                .then(response => response.json())
-                .then(() => {
-                    alert("Пользователь удалён!");
-                    loadUsers();
+                fetch(`/admin/deleteThisUser`, {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer " + localStorage.getItem("token")
+                    },
+                    body: JSON.stringify({ id: itemId })
                 })
-                .catch(console.error);
+                    .then(response => response.json())
+                    .then(() => {
+                        alert("Пользователь удалён!");
+                        loadUsers();
+                    })
+                    .catch(console.error);
+            }
+            if(buttonEdit){
+                const row = buttonEdit.closest("tr"); // Находим строку таблицы
+                const cells = row.querySelectorAll("td"); // Получаем все ячейки строки
+
+                // Извлекаем данные из ячеек
+                const userId = cells[0].textContent.trim(); // ID пользователя
+                const fio = cells[1].textContent.trim(); // ФИО
+                const email = cells[2].textContent.trim(); // Email
+                const password = cells[3].textContent.trim(); // Пароль
+                const phone = cells[4].textContent.trim(); // Телефон
+                const addInformation = cells[5].textContent.trim(); // Доп. информация
+
+                // Заполняем форму в модальном окне
+                document.getElementById("editFio").value = fio;
+                document.getElementById("editEmail").value = email;
+                document.getElementById("editPassword").value = password;
+                document.getElementById("editPhone").value = phone;
+                document.getElementById("editAddInformation").value = addInformation;
+
+                // Сохраняем ID пользователя в скрытое поле или атрибут
+                document.getElementById("editUserForm").dataset.userId = userId;
+
+                // Показываем модальное окно
+                const modal = new bootstrap.Modal(document.getElementById('exampleModal'));
+                modal.show();
+            }
         });
     });
 
@@ -199,9 +267,11 @@
                         <td><button style="margin: 2px" class="btn btn-danger" data-id="${user.id}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
   <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"></path>
 </svg></button>
-<button style="margin: 2px" class="btn btn-secondary" data-id="${user.id}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen-fill" viewBox="0 0 16 16">
-  <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001z"></path>
-</svg></button></td>
+<button style="margin: 2px" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#exampleModal" data-id="${user.id}">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen-fill" viewBox="0 0 16 16">
+        <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001z"></path>
+    </svg>
+</button></td>
 
                     </tr>`).join("");
             })
