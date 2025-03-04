@@ -279,7 +279,6 @@
     }
 </script>
 
-
 <script>
     document.body.addEventListener("htmx:responseError", function (event) {
         if (event.detail.xhr.status === 401) {
@@ -297,6 +296,19 @@
             // Добавляем токен в заголовок запроса
             event.detail.headers['Authorization'] = 'Bearer ' + token;
         }
+    });
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const modalElement = document.getElementById("exampleModal");
+
+        // Удаляем backdrop при закрытии модального окна
+        modalElement.addEventListener("hidden.bs.modal", function () {
+            document.querySelectorAll(".modal-backdrop").forEach(el => el.remove());
+            document.body.classList.remove("modal-open");
+            document.body.style.paddingRight = "";
+        });
     });
 </script>
 
