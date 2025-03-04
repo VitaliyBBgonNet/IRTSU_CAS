@@ -35,6 +35,7 @@ public class SecurityConfig {
                         .requestMatchers("/authUser/registration").permitAll()
                         .requestMatchers("/home").permitAll()
                         .requestMatchers("/authUser/profile").permitAll()
+                        .requestMatchers("/authUser/rent").permitAll()
                         .requestMatchers("/details/all").permitAll()
                         .requestMatchers("/details/filter/**").permitAll()
                         .requestMatchers("/auth/**").permitAll()
