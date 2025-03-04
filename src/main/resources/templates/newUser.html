@@ -12,6 +12,7 @@
 </head>
 
 <body>
+
 <div class="container py-3">
     <div th:replace="~{header.html :: header}"></div>
 </div>
@@ -127,8 +128,16 @@
                 <!-- Форма для редактирования -->
                 <form id="editUserForm">
                     <div class="mb-3">
-                        <label for="editFio" class="form-label">ФИО</label>
-                        <input type="text" class="form-control" id="editFio" required>
+                        <label for="editLastName" class="form-label">Фамилия</label>
+                        <input type="text" class="form-control" id="editLastName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editFirstName" class="form-label">Имя</label>
+                        <input type="text" class="form-control" id="editFirstName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editMiddleName" class="form-label">Отчество</label>
+                        <input type="text" class="form-control" id="editMiddleName">
                     </div>
                     <div class="mb-3">
                         <label for="editEmail" class="form-label">Email</label>
@@ -162,6 +171,61 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const saveButton = document.getElementById("saveChanges");
+
+        saveButton.addEventListener("click", function () {
+            // Получаем ID пользователя
+            const userId = document.getElementById("editUserForm").dataset.userId;
+
+            // Собираем данные из отдельных полей
+            const updatedUser = {
+                id: userId,
+                lastName: document.getElementById("editLastName").value.trim(),
+                firstName: document.getElementById("editFirstName").value.trim(),
+                surName: document.getElementById("editMiddleName").value.trim(),
+                email: document.getElementById("editEmail").value.trim(),
+                password: document.getElementById("editPassword").value.trim(),
+                phoneNumber: document.getElementById("editPhone").value.trim(),
+                addInformation: document.getElementById("editAddInformation").value.trim()
+            };
+
+            // Проверяем, что фамилия и имя заполнены
+            if (!updatedUser.lastName || !updatedUser.firstName) {
+                alert("Фамилия и Имя обязательны для заполнения!");
+                return;
+            }
+
+            // Отправляем запрос на сервер
+            fetch(`/admin/updateUser`, {
+                method: "PUT", // Или "PATCH"
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + localStorage.getItem("token")
+                },
+                body: JSON.stringify(updatedUser)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.statusCode === 30) return alert("Ошибка: Пользователь с таким Email уже существует!");
+                    if (data.statusCode === 48) return alert("Недостаточно прав!");
+
+                    alert("Данные пользователя успешно обновлены!");
+
+                    // Закрываем модальное окно
+                    const modal = bootstrap.Modal.getInstance(document.getElementById("exampleModal"));
+                    modal.hide();
+
+                    // Обновляем список пользователей
+                    loadUsers();
+                })
+                .catch(console.error);
+        });
+    });
+
+
+
     document.addEventListener("DOMContentLoaded", function () {
         loadUsers();
 
@@ -219,20 +283,23 @@
                     })
                     .catch(console.error);
             }
-            if(buttonEdit){
+            if (buttonEdit) {
+                console.log("Hello")
                 const row = buttonEdit.closest("tr"); // Находим строку таблицы
                 const cells = row.querySelectorAll("td"); // Получаем все ячейки строки
 
                 // Извлекаем данные из ячеек
                 const userId = cells[0].textContent.trim(); // ID пользователя
-                const fio = cells[1].textContent.trim(); // ФИО
+                const fio = cells[1].textContent.trim().split(" "); // Разделяем ФИО на массив [Фамилия, Имя, Отчество]
                 const email = cells[2].textContent.trim(); // Email
                 const password = cells[3].textContent.trim(); // Пароль
                 const phone = cells[4].textContent.trim(); // Телефон
                 const addInformation = cells[5].textContent.trim(); // Доп. информация
 
                 // Заполняем форму в модальном окне
-                document.getElementById("editFio").value = fio;
+                document.getElementById("editLastName").value = fio[0] || ""; // Фамилия
+                document.getElementById("editFirstName").value = fio[1] || ""; // Имя
+                document.getElementById("editMiddleName").value = fio[2] || ""; // Отчество (может быть пустым)
                 document.getElementById("editEmail").value = email;
                 document.getElementById("editPassword").value = password;
                 document.getElementById("editPhone").value = phone;

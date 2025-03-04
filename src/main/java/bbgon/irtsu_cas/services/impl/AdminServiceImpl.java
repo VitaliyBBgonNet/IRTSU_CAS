@@ -5,6 +5,7 @@ import bbgon.irtsu_cas.constants.ErrorCodes;
 import bbgon.irtsu_cas.dto.request.AddNewUserFromAdmin;
 import bbgon.irtsu_cas.dto.request.GroupEditDataRequest;
 import bbgon.irtsu_cas.dto.request.NewGroupRequest;
+import bbgon.irtsu_cas.dto.request.UpdateUser;
 import bbgon.irtsu_cas.dto.response.CustomSuccessResponse;
 import bbgon.irtsu_cas.dto.response.LoginUserResponse;
 import bbgon.irtsu_cas.dto.response.SuccessResponse;
@@ -44,6 +45,34 @@ public class AdminServiceImpl implements AdminService {
     private final UserRepository userRepository;
 
     private final AESUtil aesUtil;
+
+    @Transactional
+    @Override
+    public CustomSuccessResponse<SuccessResponse> updateUserData(UpdateUser updateUser) {
+        UsersEntity userAdmin = userService.findUserEntityById(userService.getUserIdByToken());
+        UsersEntity usersEntityUpdate = userService.findUserEntityById(UUID.fromString(updateUser.getId()));
+
+        if (!"Admin".equalsIgnoreCase(userAdmin.getRole())) {
+            throw new CustomException(ErrorCodes.ACCESS_DENIED);
+        }
+
+        usersEntityUpdate.setName(updateUser.getFirstName());
+        usersEntityUpdate.setLastName(updateUser.getLastName());
+        usersEntityUpdate.setSurname(updateUser.getSurName());
+        usersEntityUpdate.setEmail(updateUser.getEmail());
+        usersEntityUpdate.setPhone(updateUser.getPhoneNumber());
+
+        if (updateUser.getPassword() != null && !updateUser.getPassword().isEmpty()) {
+            usersEntityUpdate.setPassword(aesUtil.encrypt(updateUser.getPassword()));
+        }
+
+        usersEntityUpdate.setAddInformation(updateUser.getAddInformation());
+
+        userRepository.save(usersEntityUpdate);
+
+        return new CustomSuccessResponse<>(new SuccessResponse());
+    }
+
 
     @Override
     public CustomSuccessResponse<SuccessResponse> createNewUser(AddNewUserFromAdmin addNewUserFromAdmin) {

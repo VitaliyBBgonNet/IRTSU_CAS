@@ -3,6 +3,7 @@ package bbgon.irtsu_cas.controllers.restControllers;
 import bbgon.irtsu_cas.dto.request.AddNewUserFromAdmin;
 import bbgon.irtsu_cas.dto.request.GroupEditDataRequest;
 import bbgon.irtsu_cas.dto.request.NewGroupRequest;
+import bbgon.irtsu_cas.dto.request.UpdateUser;
 import bbgon.irtsu_cas.dto.response.CustomSuccessResponse;
 import bbgon.irtsu_cas.dto.response.SuccessResponse;
 
@@ -27,6 +28,12 @@ public class AdminController {
     private final AdminService adminService;
     private final ResourceService resourceService;
     private final UserService userService;
+
+    @PutMapping("/updateUser")
+    public ResponseEntity<CustomSuccessResponse<SuccessResponse>> updateUserData(
+            @RequestBody UpdateUser updateUser){
+        return ResponseEntity.ok(adminService.updateUserData(updateUser));
+    }
 
     @GetMapping("/getUsers")
     public ResponseEntity<List<Users>> getUsers() {
