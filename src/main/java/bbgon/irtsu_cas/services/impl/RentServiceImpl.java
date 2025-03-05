@@ -60,7 +60,6 @@ public class RentServiceImpl implements RentService {
         rentEntity.setDetailRent(detailsEntity);
         rentEntity.setRentalStatus("RENTED");
         rentEntity.setUserRent(usersEntity);
-        detailsEntity.setRent(rentEntity);
 
         rentRepository.save(rentEntity);
 

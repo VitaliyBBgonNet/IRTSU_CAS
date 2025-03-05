@@ -13,7 +13,6 @@ import java.util.UUID;
 @Getter
 @Setter
 public class UsersEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
@@ -35,6 +34,9 @@ public class UsersEntity {
 
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DetailsEntity> userDetails;
+
+    @OneToMany(mappedBy = "tenant", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DetailsEntity> rentedDetails; // Новое поле для отслеживания арендуемых деталей
 
     private LocalDateTime createdAccount;
 }

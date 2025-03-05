@@ -1,12 +1,15 @@
 package bbgon.irtsu_cas.services.impl;
 
+import bbgon.irtsu_cas.CustomException;
+import bbgon.irtsu_cas.constants.ErrorCodes;
 import bbgon.irtsu_cas.dto.request.DetailProperties;
-import bbgon.irtsu_cas.dto.request.FilterDetailRequest;
 import bbgon.irtsu_cas.dto.response.*;
 import bbgon.irtsu_cas.entity.DetailsEntity;
 import bbgon.irtsu_cas.entity.QDetailsEntity;
+import bbgon.irtsu_cas.entity.UsersEntity;
 import bbgon.irtsu_cas.mappers.DetailMapper;
 import bbgon.irtsu_cas.repositories.DetailsRepository;
+import bbgon.irtsu_cas.repositories.UserRepository;
 import bbgon.irtsu_cas.services.DetailsService;
 import bbgon.irtsu_cas.services.UserService;
 import bbgon.irtsu_cas.util.QPredicates;
@@ -23,8 +26,11 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component
 @RequiredArgsConstructor
@@ -38,6 +44,7 @@ public class DetailsServiceImpl implements DetailsService {
 
     @PersistenceContext
     private final EntityManager entityManager;
+    private final UserRepository userRepository;
 
     @Override
     public CustomSuccessResponse<SuccessResponse> deleteElementById(String idElement) {
@@ -47,7 +54,7 @@ public class DetailsServiceImpl implements DetailsService {
         Optional<DetailsEntity> detailsEntityOptional = detailsRepository.findById(UUID.fromString(idElement));
         if (detailsEntityOptional.isPresent()) {
             DetailsEntity detailsEntity = detailsEntityOptional.get();
-            if(detailsEntity.getOwner().getId().equals(uuidAuthUser)) {
+            if (detailsEntity.getOwner().getId().equals(uuidAuthUser)) {
                 detailsRepository.delete(detailsEntity);
             }
         }
@@ -56,27 +63,53 @@ public class DetailsServiceImpl implements DetailsService {
 
     @Override
     public List<TableElementResponse> getDetailsForAuthUser() {
-
         UUID uuidAuthUser = userService.getUserIdByToken();
+        if (uuidAuthUser == null) {
+            return List.of();
+        }
 
-        List<TableElementResponse> list = detailsRepository.findAll().stream()
-                .filter(detailsEntity -> detailsEntity.getOwner().getId().equals(uuidAuthUser)) // Оставляем только свои компоненты
-                .map(detailsEntity -> new TableElementResponse(
-                        detailsEntity.getId(),
-                        detailsEntity.getName(),
-                        detailsEntity.getDescription(),
-                        detailsEntity.getStatus(),
-                        detailsEntity.getOwner().getName() + " " + detailsEntity.getOwner().getLastName(),
-                        detailsEntity.getOwner().getAvatar(),
-                        detailsEntity.getTenant()
-                ))
-                .toList();
+        return detailsRepository.findAll().stream()
+                .filter(detailsEntity -> {
+                    UsersEntity owner = detailsEntity.getOwner();
+                    return owner != null && owner.getId() != null && owner.getId().equals(uuidAuthUser);
+                })
+                .map(detailsEntity -> {
+                    String ownerFullName = (detailsEntity.getOwner().getName() != null ? detailsEntity.getOwner().getName() : "") + " " +
+                            (detailsEntity.getOwner().getLastName() != null ? detailsEntity.getOwner().getLastName() : "");
+                    String ownerAvatar = detailsEntity.getOwner().getAvatar() != null
+                            ? detailsEntity.getOwner().getAvatar()
+                            : "";
 
-        return list;
+                    String tenantFullName = detailsEntity.getTenant() != null
+                            ? Stream.of(
+                                    detailsEntity.getTenant().getLastName(),
+                                    detailsEntity.getTenant().getName(),
+                                    detailsEntity.getTenant().getSurname()
+                            )
+                            .filter(Objects::nonNull)
+                            .filter(str -> !str.trim().isEmpty())
+                            .collect(Collectors.joining(" "))
+                            : "-";
+
+                    return new TableElementResponse(
+                            detailsEntity.getId(),
+                            detailsEntity.getName(),
+                            detailsEntity.getDescription(),
+                            detailsEntity.getStatus(),
+                            ownerFullName.trim(),
+                            ownerAvatar,
+                            tenantFullName
+                    );
+                })
+                .collect(Collectors.toList());
     }
 
     @Override
     public CustomSuccessResponse<String> createDetail(DetailProperties detailProperties) {
+
+        Optional<UsersEntity> tenantEntity = userRepository.findById(UUID.fromString(detailProperties.getTenant()));
+        tenantEntity.orElseThrow(() -> new CustomException(ErrorCodes.USER_NOT_FOUND));
+
         DetailsEntity detailsEntity = new DetailsEntity();
         detailsEntity.setCreatedDetail(LocalDateTime.now());
         detailsEntity.setDescription(detailProperties.getDescription());
@@ -85,8 +118,7 @@ public class DetailsServiceImpl implements DetailsService {
         detailsEntity.setDocumentation(detailProperties.getDocumentation());
         detailsEntity.setStatus(detailProperties.getStatus());
         detailsEntity.setImage(detailProperties.getImage());
-        detailsEntity.setRent(null);
-        detailsEntity.setTenant(detailProperties.getTenant());
+        detailsEntity.setTenant(tenantEntity.get());
         detailsRepository.save(detailsEntity);
         return new CustomSuccessResponse<>("DETAIL ADD");
     }
@@ -99,7 +131,6 @@ public class DetailsServiceImpl implements DetailsService {
 
         return new CustomSuccessResponse<>(new PageableResponse<>(mapDetails(detailsEntityPage), detailsEntityPage.getTotalElements()));
     }
-
 
 
     @Override
@@ -136,7 +167,6 @@ public class DetailsServiceImpl implements DetailsService {
                 .add(detailName, detailsEntity.name::containsIgnoreCase)
                 .add(status, detailsEntity.status::containsIgnoreCase)
                 .add(ownerId, detailsEntity.owner.id::eq)
-                .add(orderHumanId, detailsEntity.rent.id::eq)
                 .add(groupId, detailsEntity.group.id::eq)
                 .add(dataAdd, detailsEntity.createdDetail::eq)
                 .buildAnd();

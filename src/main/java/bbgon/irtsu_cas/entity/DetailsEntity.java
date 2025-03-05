@@ -35,10 +35,8 @@ public class DetailsEntity {
 
     private LocalDateTime createdDetail;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name =  "rent_id")
-    private RentEntity rent;
-
-    private String tenant;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tenant_id")
+    private UsersEntity tenant;
 }
 
