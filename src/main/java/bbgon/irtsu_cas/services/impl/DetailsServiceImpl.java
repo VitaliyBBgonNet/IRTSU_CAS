@@ -111,7 +111,6 @@ public class DetailsServiceImpl implements DetailsService {
 
     @Override
     public CustomSuccessResponse<String> createDetail(DetailProperties detailProperties) {
-
         if (detailProperties == null) {
             throw new CustomException(ErrorCodes.UNKNOWN);
         }
@@ -136,7 +135,7 @@ public class DetailsServiceImpl implements DetailsService {
         detailsEntity.setOwner(owner);
 
         if (detailProperties.getTenant() != null && !detailProperties.getTenant().trim().isEmpty()) {
-            UUID tenantId = UUID.fromString(detailProperties.getTenant());
+            UUID tenantId = UUID.fromString(detailProperties.getTenant().trim()); // Убираем лишние пробелы
             Optional<UsersEntity> tenantEntity = userRepository.findById(tenantId);
             detailsEntity.setTenant(tenantEntity.orElseThrow(() -> new CustomException(ErrorCodes.USER_NOT_FOUND)));
         } else {
