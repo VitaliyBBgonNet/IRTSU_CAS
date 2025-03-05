@@ -115,7 +115,7 @@ public class ResourceServiceImpl implements ResourceService {
         QDetailsEntity detailsEntity = QDetailsEntity.detailsEntity;
 
         FIO fio = new FIO();
-        if(ownerFullName != null) {
+        if (ownerFullName != null && !ownerFullName.trim().isEmpty()) {
             fio = splitFullName(ownerFullName);
         }
 
@@ -123,37 +123,71 @@ public class ResourceServiceImpl implements ResourceService {
 
         Predicate predicate = QPredicates.builder()
                 .add(ownerId, detailsEntity.owner.id::eq)
-                .add(detailName , detailsEntity.name::containsIgnoreCase)
+                .add(detailName, detailsEntity.name::containsIgnoreCase)
                 .add(status, detailsEntity.status::containsIgnoreCase)
                 .add(fio.getName(), detailsEntity.owner.name::containsIgnoreCase)
                 .add(fio.getLastname(), detailsEntity.owner.lastName::containsIgnoreCase)
                 .add(fio.getSurname(), detailsEntity.owner.surname::containsIgnoreCase)
                 .buildAnd();
+
         Page<DetailsEntity> result = detailsRepository.findAll(predicate, pageable);
 
         List<TableElementResponse> detailResponseList = result.getContent().stream()
                 .map(entity -> {
+
+                    String ownerFullNameStr = entity.getOwner() != null
+                            ? (entity.getOwner().getName() != null ? entity.getOwner().getName() : "") + " " +
+                            (entity.getOwner().getLastName() != null ? entity.getOwner().getLastName() : "")
+                            : "—";
+                    String ownerAvatar = entity.getOwner() != null && entity.getOwner().getAvatar() != null
+                            ? entity.getOwner().getAvatar()
+                            : "";
+
+                    String tenantFullName = entity.getTenant() != null
+                            ? Stream.of(
+                                    entity.getTenant().getLastName(),
+                                    entity.getTenant().getName(),
+                                    entity.getTenant().getSurname()
+                            )
+                            .filter(Objects::nonNull)
+                            .filter(str -> !str.trim().isEmpty())
+                            .collect(Collectors.joining(" "))
+                            : "-";
+
                     return new TableElementResponse(
                             entity.getId(),
                             entity.getName(),
                             entity.getDescription(),
                             entity.getStatus(),
-                            entity.getOwner().getName() + " " + entity.getOwner().getLastName(),
-                            entity.getOwner().getAvatar(),
-                            entity.getTenant().getName());
-                }).toList();
+                            ownerFullNameStr.trim(),
+                            ownerAvatar,
+                            tenantFullName
+                    );
+                })
+                .collect(Collectors.toList());
 
-        System.out.println(result.iterator().hasNext());
         return detailResponseList;
     }
 
     private FIO splitFullName(String fullName) {
-        String[] strings = fullName.split(" ");
+        if (fullName == null || fullName.trim().isEmpty()) {
+            return new FIO(null, null, null);
+        }
+
+        String[] strings = fullName.trim().split("\\s+"); // Разделяем по любому количеству пробелов
         FIO fio;
-        if (strings.length == 3) {
-            fio = new FIO(strings[0], strings[1], strings[2]);
-        }else {
-            fio = new FIO(null,null,null);
+        switch (strings.length) {
+            case 3:
+                fio = new FIO(strings[0], strings[1], strings[2]);
+                break;
+            case 2:
+                fio = new FIO(strings[0], null, strings[1]); // Предполагаем, что без отчества
+                break;
+            case 1:
+                fio = new FIO(strings[0], null, null); // Только имя
+                break;
+            default:
+                fio = new FIO(null, null, null); // Если формат некорректен
         }
         return fio;
     }
