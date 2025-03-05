@@ -78,6 +78,10 @@ public class ResourceServiceImpl implements ResourceService {
                             .collect(Collectors.joining(" "))
                             : "-";
 
+                    String documentation = detailsEntity.getDocumentation() != null
+                            ? detailsEntity.getDocumentation()
+                            : "-";
+
                     return new TableElementResponse(
                             detailsEntity.getId(),
                             detailsEntity.getName(),
@@ -85,7 +89,8 @@ public class ResourceServiceImpl implements ResourceService {
                             detailsEntity.getStatus(),
                             ownerFullName.trim(), // Убираем лишние пробелы
                             ownerAvatar,
-                            tenantFullName
+                            tenantFullName,
+                            documentation
                     );
                 })
                 .collect(Collectors.toList());
@@ -128,13 +133,14 @@ public class ResourceServiceImpl implements ResourceService {
                 .add(fio.getName(), detailsEntity.owner.name::containsIgnoreCase)
                 .add(fio.getLastname(), detailsEntity.owner.lastName::containsIgnoreCase)
                 .add(fio.getSurname(), detailsEntity.owner.surname::containsIgnoreCase)
+                .add(detailName, detailsEntity.documentation::containsIgnoreCase) // Добавляем фильтр по документации, если нужно
                 .buildAnd();
 
         Page<DetailsEntity> result = detailsRepository.findAll(predicate, pageable);
 
         List<TableElementResponse> detailResponseList = result.getContent().stream()
                 .map(entity -> {
-
+                    // Безопасное получение данных владельца
                     String ownerFullNameStr = entity.getOwner() != null
                             ? (entity.getOwner().getName() != null ? entity.getOwner().getName() : "") + " " +
                             (entity.getOwner().getLastName() != null ? entity.getOwner().getLastName() : "")
@@ -143,15 +149,21 @@ public class ResourceServiceImpl implements ResourceService {
                             ? entity.getOwner().getAvatar()
                             : "";
 
+                    // Безопасное получение полного ФИО арендатора (Имя Отчество Фамилия)
                     String tenantFullName = entity.getTenant() != null
                             ? Stream.of(
-                                    entity.getTenant().getLastName(),
                                     entity.getTenant().getName(),
-                                    entity.getTenant().getSurname()
+                                    entity.getTenant().getSurname(),
+                                    entity.getTenant().getLastName()
                             )
                             .filter(Objects::nonNull)
                             .filter(str -> !str.trim().isEmpty())
                             .collect(Collectors.joining(" "))
+                            : "-";
+
+                    // Безопасное получение документации
+                    String documentation = entity.getDocumentation() != null
+                            ? entity.getDocumentation()
                             : "-";
 
                     return new TableElementResponse(
@@ -159,9 +171,10 @@ public class ResourceServiceImpl implements ResourceService {
                             entity.getName(),
                             entity.getDescription(),
                             entity.getStatus(),
-                            ownerFullNameStr.trim(),
+                            ownerFullNameStr.trim(), // Убираем лишние пробелы
                             ownerAvatar,
-                            tenantFullName
+                            tenantFullName,
+                            documentation // Добавили документацию в ответ
                     );
                 })
                 .collect(Collectors.toList());

@@ -29,6 +29,25 @@
         .form-group, .mb-3 {
             position: relative;
         }
+        .documentation-link {
+            display: inline-block; /* Ограничиваем ширину ссылки */
+            max-width: 100px; /* Ограничиваем ширину ссылки, чтобы не растягивать таблицу */
+            white-space: nowrap; /* Предотвращаем перенос текста */
+            overflow: hidden; /* Скрываем лишний текст, если он не помещается */
+            text-overflow: ellipsis; /* Добавляем троеточие для обрезанного текста */
+            text-decoration: none; /* Убираем подчёркивание по умолчанию */
+            color: #007bff; /* Цвет ссылки, как в Bootstrap */
+            cursor: pointer; /* Курсор для кликабельности */
+        }
+        .documentation-link:hover {
+            text-decoration: underline; /* Подчёркивание при наведении */
+            color: #0056b3; /* Темнее при наведении */
+        }
+        #invalidDocumentationModal .modal-body {
+            word-wrap: break-word; /* Разбиваем длинные строки для текста ссылки */
+            max-height: 200px; /* Ограничиваем высоту модального окна */
+            overflow-y: auto; /* Добавляем прокрутку, если текст слишком длинный */
+        }
     </style>
 </head>
 <body>
@@ -89,6 +108,7 @@
                     <option value="В аренде">В аренде</option>
                     <option value="У владельца">У владельца</option>
                 </select>
+                <input type="text" id="componentDocumentationFilter" class="form-control w-auto" placeholder="Ссылка на документацию">
                 <button type="submit" class="btn btn-primary">Выбрать</button>
                 <button id="loadTableBtn" class="btn btn-primary">Мои компоненты</button>
             </div>
@@ -105,6 +125,7 @@
                 <th>Статус</th>
                 <th>Владелец</th>
                 <th>Арендатор</th>
+                <th>Документация</th> <!-- Добавлен столбец для документации -->
                 <th>Действие</th>
             </tr>
             </thead>
@@ -158,6 +179,24 @@
     </div>
 </div>
 
+<!-- Модальное окно для невалидной ссылки -->
+<div class="modal fade" id="invalidDocumentationModal" tabindex="-1" aria-labelledby="invalidDocumentationModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="invalidDocumentationModalLabel">Невалидная ссылка на документацию</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="invalidDocumentationText">
+                <!-- Текст ссылки будет вставлен здесь -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     let usersList = [];
 
@@ -184,6 +223,17 @@
             window.location.href = "/authUser/login";
         }
     });
+
+    // Функция для проверки валидности URL
+    function isValidUrl(url) {
+        if (!url || url.trim() === '') return false;
+        try {
+            new URL(url);
+            return true;
+        } catch (e) {
+            return false;
+        }
+    }
 
     // Функция для отображения подсказок
     function showSuggestions(inputId, suggestionsId, hiddenId) {
@@ -262,8 +312,8 @@
             name: componentName,
             description: componentDescription,
             status: componentStatus,
-            documentation: componentDocumentation,
-            tenant: componentStatus === "В аренде" ? tenantId : null
+            documentation: componentDocumentation, // Убедились, что отправляем documentation
+            tenantId: componentStatus === "В аренде" ? tenantId : null // Отправляем tenantId вместо tenant
         };
 
         const token = localStorage.getItem('token');
@@ -293,6 +343,7 @@
         const filterData = {
             name: document.getElementById("componentNameFilter").value.trim(),
             status: document.getElementById("componentStatusFilter").value,
+            documentation: document.getElementById("componentDocumentationFilter").value.trim() // Добавили фильтр по документации
         };
         const token = localStorage.getItem("token");
         fetch("/details/getDetailWitchPaginationFilterForAuthUser", {
@@ -316,178 +367,28 @@
                     let row = document.createElement("tr");
                     let statusColor = component.status === "У владельца" ? "color: green;" :
                         component.status === "В аренде" ? "color: red;" : "";
+                    let tenantName = component.tenantId ? usersList.find(user => user.id.toString() === component.tenantId)?.fio || "-" : "-";
                     row.innerHTML = `
-                    <td><p class="shortened-id">${component.id}</p></td>
-                    <td>${component.name}</td>
-                    <td>${component.description}</td>
-                    <td style="${statusColor}">${component.status}</td>
-                    <td>${component.owner || "—"}</td>
-                    <td>${component.tenant || "-"}</td>
-                    <td>
-                        <button style="margin: 2px" class="btn btn-danger" data-id="${component.id}">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
-                                <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"></path>
-                            </svg>
-                        </button>
-                        <button style="margin: 2px" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#exampleModal" data-id="${component.id}">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen-fill" viewBox="0 0 16 16">
-                                <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001z"></path>
-                            </svg>
-                        </button>
-                    </td>
-                `;
-                    tableBody.appendChild(row);
-                });
-            })
-            .catch(error => console.error("Ошибка загрузки данных:", error));
-    });
-
-    document.getElementById("componentListBody").addEventListener("click", function (event) {
-        const buttonEdit = event.target.closest(".btn-secondary");
-        if (buttonEdit) {
-            const row = buttonEdit.closest("tr");
-            const cells = row.querySelectorAll("td");
-            const componentId = cells[0].textContent.trim();
-            const componentName = cells[1].textContent.trim();
-            const componentDescription = cells[2].textContent.trim();
-            const componentStatus = cells[3].textContent.trim();
-            const componentOwner = cells[4].textContent.trim();
-            const componentTenant = cells[5].textContent.trim();
-
-            document.getElementById("editComponentId").value = componentId;
-            document.getElementById("editComponentName").value = componentName;
-            document.getElementById("editComponentDescription").value = componentDescription;
-            document.getElementById("editComponentStatus").value = componentStatus;
-            document.getElementById("editComponentDocumentation").value = "";
-
-            const rentedByField = document.getElementById("editRentedByField");
-            const editRentedByInput = document.getElementById("editRentedBy");
-            const editRentedById = document.getElementById("editRentedById");
-            if (componentStatus === "В аренде") {
-                rentedByField.style.display = "block";
-                editRentedByInput.value = componentTenant;
-                const selectedUser = usersList.find(user => user.fio === componentTenant);
-                editRentedById.value = selectedUser ? selectedUser.id : '';
-            } else {
-                rentedByField.style.display = "none";
-                editRentedByInput.value = '';
-                editRentedById.value = '';
-                document.getElementById('editRentedBySuggestions').style.display = 'none';
-            }
-
-            const modal = new bootstrap.Modal(document.getElementById("exampleModal"));
-            modal.show();
-        }
-    });
-
-    document.getElementById("editComponentStatus").addEventListener("change", function () {
-        const rentedByField = document.getElementById("editRentedByField");
-        const editRentedByInput = document.getElementById("editRentedBy");
-        const editRentedById = document.getElementById("editRentedById");
-        if (this.value === "В аренде") {
-            rentedByField.style.display = "block";
-            editRentedByInput.value = '';
-            editRentedById.value = '';
-        } else {
-            rentedByField.style.display = "none";
-            editRentedByInput.value = '';
-            editRentedById.value = '';
-            document.getElementById('editRentedBySuggestions').style.display = 'none';
-        }
-    });
-
-    document.getElementById('editRentedBy').addEventListener('input', function() {
-        showSuggestions('editRentedBy', 'editRentedBySuggestions', 'editRentedById');
-    });
-
-    document.getElementById("saveChanges").addEventListener("click", function() {
-        const componentId = document.getElementById("editComponentId").value;
-        const componentName = document.getElementById("editComponentName").value;
-        const componentDescription = document.getElementById("editComponentDescription").value;
-        const componentStatus = document.getElementById("editComponentStatus").value;
-        const componentDocumentation = document.getElementById("editComponentDocumentation").value;
-        const tenantId = document.getElementById("editRentedById").value;
-
-        if (componentStatus === "В аренде" && !tenantId) {
-            alert("Пожалуйста, выберите арендатора из списка!");
-            return;
-        }
-
-        const data = {
-            id: componentId,
-            name: componentName,
-            description: componentDescription,
-            status: componentStatus,
-            documentation: componentDocumentation,
-            tenant: componentStatus === "В аренде" ? tenantId : null
-        };
-
-        const token = localStorage.getItem('token');
-        if (token) {
-            fetch('/details/update', {
-                method: 'PUT',
-                headers: {
-                    'Authorization': 'Bearer ' + token,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            })
-                .then(response => {
-                    if (response.ok) {
-                        const modal = bootstrap.Modal.getInstance(document.getElementById("exampleModal"));
-                        modal.hide();
-                        document.getElementById("loadTableBtn").click();
-                    } else {
-                        throw new Error('Ошибка при обновлении данных');
-                    }
-                })
-                .catch(error => console.error('Ошибка:', error));
-        }
-    });
-
-    document.getElementById("loadTableBtn").addEventListener("click", function (event) {
-        event.preventDefault();
-        let token = localStorage.getItem("token");
-        fetch('/details/getAllDetailsForAuthUser', {
-            method: 'GET',
-            headers: {
-                'Authorization': 'Bearer ' + token,
-                'Content-Type': 'application/json'
-            }
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("Ошибка запроса: " + response.status);
-                }
-                return response.json();
-            })
-            .then(data => {
-                let tableBody = document.getElementById("componentListBody");
-                tableBody.innerHTML = "";
-                data.forEach(component => {
-                    let row = document.createElement("tr");
-                    let statusColor = component.status === "У владельца" ? "color: green;" :
-                        component.status === "В аренде" ? "color: red;" : "";
-                    row.innerHTML = `
-                    <td><p class="shortened-id">${component.id}</p></td>
-                    <td>${component.name}</td>
-                    <td>${component.description}</td>
-                    <td style="${statusColor}">${component.status}</td>
-                    <td>${component.owner || "—"}</td>
-                    <td>${component.tenant || "-"}</td>
-                    <td>
-                        <button style="margin: 2px" class="btn btn-danger" data-id="${component.id}">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
-                                <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"></path>
-                            </svg>
-                        </button>
-                        <button style="margin: 2px" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#exampleModal" data-id="${component.id}">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen-fill" viewBox="0 0 16 16">
-                                <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001z"></path>
-                            </svg>
-                        </button>
-                    </td>
-                `;
+                        <td><p class="shortened-id">${component.id}</p></td>
+                        <td>${component.name}</td>
+                        <td>${component.description}</td>
+                        <td style="${statusColor}">${component.status}</td>
+                        <td>${component.owner || "—"}</td>
+                        <td>${tenantName}</td>
+                        <td><span class="documentation-link" data-documentation="${component.documentation || ''}">Документация</span></td> <!-- Используем span с data-атрибутом -->
+                        <td>
+                            <button style="margin: 2px" class="btn btn-danger" data-id="${component.id}">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                                    <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"></path>
+                                </svg>
+                            </button>
+                            <button style="margin: 2px" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#exampleModal" data-id="${component.id}">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen-fill" viewBox="0 0 16 16">
+                                    <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001z"></path>
+                                </svg>
+                            </button>
+                        </td>
+                    `;
                     tableBody.appendChild(row);
                 });
             })
@@ -519,11 +420,31 @@
                 })
                 .catch(error => console.error("Ошибка удаления:", error));
         }
+
+        // Обработка клика по ссылке документации
+        const documentationLink = event.target.closest('.documentation-link');
+        if (documentationLink) {
+            const documentationUrl = documentationLink.getAttribute('data-documentation');
+            if (isValidUrl(documentationUrl)) {
+                window.open(documentationUrl, '_blank'); // Открываем в новой вкладке, если URL валиден
+            } else {
+                document.getElementById('invalidDocumentationText').textContent = documentationUrl || 'Ссылка не указана';
+                const modal = new bootstrap.Modal(document.getElementById('invalidDocumentationModal'));
+                modal.show();
+            }
+        }
     });
 
     document.addEventListener("DOMContentLoaded", function () {
-        const modalElement = document.getElementById("exampleModal");
-        modalElement.addEventListener("hidden.bs.modal", function () {
+        const exampleModal = document.getElementById("exampleModal");
+        exampleModal.addEventListener("hidden.bs.modal", function () {
+            document.querySelectorAll(".modal-backdrop").forEach(el => el.remove());
+            document.body.classList.remove("modal-open");
+            document.body.style.paddingRight = "";
+        });
+
+        const invalidModal = document.getElementById("invalidDocumentationModal");
+        invalidModal.addEventListener("hidden.bs.modal", function () {
             document.querySelectorAll(".modal-backdrop").forEach(el => el.remove());
             document.body.classList.remove("modal-open");
             document.body.style.paddingRight = "";

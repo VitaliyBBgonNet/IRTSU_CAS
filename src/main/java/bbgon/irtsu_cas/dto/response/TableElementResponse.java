@@ -21,4 +21,6 @@ public class TableElementResponse {
     private String avatar;
 
     private String tenant;
+
+    private String documentation;
 }

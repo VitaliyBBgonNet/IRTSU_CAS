@@ -91,6 +91,10 @@ public class DetailsServiceImpl implements DetailsService {
                             .collect(Collectors.joining(" "))
                             : "-";
 
+                    String documentation = detailsEntity.getDocumentation() != null
+                            ? detailsEntity.getDocumentation()
+                            : "-";
+
                     return new TableElementResponse(
                             detailsEntity.getId(),
                             detailsEntity.getName(),
@@ -98,7 +102,8 @@ public class DetailsServiceImpl implements DetailsService {
                             detailsEntity.getStatus(),
                             ownerFullName.trim(),
                             ownerAvatar,
-                            tenantFullName
+                            tenantFullName,
+                            documentation
                     );
                 })
                 .collect(Collectors.toList());
@@ -107,19 +112,46 @@ public class DetailsServiceImpl implements DetailsService {
     @Override
     public CustomSuccessResponse<String> createDetail(DetailProperties detailProperties) {
 
-        Optional<UsersEntity> tenantEntity = userRepository.findById(UUID.fromString(detailProperties.getTenant()));
-        tenantEntity.orElseThrow(() -> new CustomException(ErrorCodes.USER_NOT_FOUND));
+        if (detailProperties == null) {
+            throw new CustomException(ErrorCodes.UNKNOWN);
+        }
+
+        UUID ownerId = userService.getUserIdByToken();
+        if (ownerId == null) {
+            throw new CustomException(ErrorCodes.USER_NOT_FOUND);
+        }
+
+        UsersEntity owner = userService.findUserEntityById(ownerId);
+        if (owner == null) {
+            throw new CustomException(ErrorCodes.USER_NOT_FOUND);
+        }
 
         DetailsEntity detailsEntity = new DetailsEntity();
         detailsEntity.setCreatedDetail(LocalDateTime.now());
         detailsEntity.setDescription(detailProperties.getDescription());
         detailsEntity.setName(detailProperties.getName());
-        detailsEntity.setOwner(userService.findUserEntityById(userService.getUserIdByToken()));
         detailsEntity.setDocumentation(detailProperties.getDocumentation());
         detailsEntity.setStatus(detailProperties.getStatus());
         detailsEntity.setImage(detailProperties.getImage());
-        detailsEntity.setTenant(tenantEntity.get());
+        detailsEntity.setOwner(owner);
+
+        if (detailProperties.getTenant() != null && !detailProperties.getTenant().trim().isEmpty()) {
+            UUID tenantId = UUID.fromString(detailProperties.getTenant());
+            Optional<UsersEntity> tenantEntity = userRepository.findById(tenantId);
+            detailsEntity.setTenant(tenantEntity.orElseThrow(() -> new CustomException(ErrorCodes.USER_NOT_FOUND)));
+        } else {
+            detailsEntity.setTenant(null);
+        }
+
+        if (detailsEntity.getName() == null || detailsEntity.getName().trim().isEmpty()) {
+            throw new CustomException(ErrorCodes.UNKNOWN);
+        }
+        if (detailsEntity.getStatus() == null || detailsEntity.getStatus().trim().isEmpty()) {
+            throw new CustomException(ErrorCodes.UNKNOWN);
+        }
+
         detailsRepository.save(detailsEntity);
+
         return new CustomSuccessResponse<>("DETAIL ADD");
     }
 
