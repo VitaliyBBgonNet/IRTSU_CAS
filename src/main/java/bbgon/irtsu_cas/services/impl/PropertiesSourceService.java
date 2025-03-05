@@ -1,21 +1,23 @@
 package bbgon.irtsu_cas.services.impl;
 
 import bbgon.irtsu_cas.dto.response.PropertiesResponse;
-import bbgon.irtsu_cas.entity.DetailsEntity;
+import bbgon.irtsu_cas.dto.response.UserListResponse;
 import bbgon.irtsu_cas.repositories.DetailsRepository;
 import bbgon.irtsu_cas.repositories.GroupRepository;
 import bbgon.irtsu_cas.repositories.UserRepository;
+import bbgon.irtsu_cas.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class PropertiesSourceService {
 
+    private final UserService userService;
+    private final UserRepository userRepository;
     private final DetailsRepository detailsRepository;
     private final GroupRepository groupRepository;
 
@@ -74,4 +76,17 @@ public class PropertiesSourceService {
         return html.toString();
     }
 
+    public List<UserListResponse> getAllUsers(){
+        return userRepository.findAll().stream()
+                .filter(usersEntity -> usersEntity.getRole().equals("Teacher"))
+                .map(usersEntity -> {
+                    UserListResponse userListResponse = new UserListResponse();
+                    userListResponse.setId(String.valueOf(usersEntity.getId()));
+                    userListResponse.setFio(
+                            usersEntity.getLastName() + " " + usersEntity.getName() + " " + usersEntity.getSurname()
+                    );
+                    return userListResponse;
+                })
+                .toList();
+    }
 }
