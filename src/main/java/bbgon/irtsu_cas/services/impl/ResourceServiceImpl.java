@@ -20,10 +20,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -57,16 +56,39 @@ public class ResourceServiceImpl implements ResourceService {
     @Override
     public List<TableElementResponse> listAllElements() {
         return detailsRepository.findAll().stream()
-                .map((detailsEntity) -> {
+                .map(detailsEntity -> {
+
+                    String ownerFullName = detailsEntity.getOwner() != null
+                            ? (detailsEntity.getOwner().getName() != null ? detailsEntity.getOwner().getName() : "") + " " +
+                            (detailsEntity.getOwner().getLastName() != null ? detailsEntity.getOwner().getLastName() : "")
+                            : "—";
+                    String ownerAvatar = detailsEntity.getOwner() != null && detailsEntity.getOwner().getAvatar() != null
+                            ? detailsEntity.getOwner().getAvatar()
+                            : "";
+
+
+                    String tenantFullName = detailsEntity.getTenant() != null
+                            ? Stream.of(
+                                    detailsEntity.getTenant().getName(),
+                                    detailsEntity.getTenant().getSurname(),
+                                    detailsEntity.getTenant().getLastName()
+                            )
+                            .filter(Objects::nonNull)
+                            .filter(str -> !str.trim().isEmpty())
+                            .collect(Collectors.joining(" "))
+                            : "-";
+
                     return new TableElementResponse(
                             detailsEntity.getId(),
                             detailsEntity.getName(),
                             detailsEntity.getDescription(),
                             detailsEntity.getStatus(),
-                            detailsEntity.getOwner().getName() + " " + detailsEntity.getOwner().getLastName(),
-                            detailsEntity.getOwner().getAvatar(),
-                            detailsEntity.getTenant().getName());
-                }).toList();
+                            ownerFullName.trim(), // Убираем лишние пробелы
+                            ownerAvatar,
+                            tenantFullName
+                    );
+                })
+                .collect(Collectors.toList());
     }
 
     public List<TableElementResponse> getDetailWitchPaginationFilterForAuthUser(
