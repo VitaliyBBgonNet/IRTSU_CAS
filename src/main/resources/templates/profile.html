@@ -48,6 +48,39 @@
             max-height: 200px; /* Ограничиваем высоту модального окна */
             overflow-y: auto; /* Добавляем прокрутку, если текст слишком длинный */
         }
+        .character-limit-tooltip {
+            display: none;
+            position: absolute;
+            background-color: #dc3545; /* Красный фон для акцента */
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            z-index: 1001; /* Выше других элементов */
+            top: -30px; /* Позиция над полем */
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .character-limit-tooltip::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 5px;
+            border-style: solid;
+            border-color: #dc3545 transparent transparent transparent;
+        }
+        #componentDescription.limit-reached {
+            background-color: #ffebee; /* Лёгкий красный фон для textarea */
+            border: 2px solid #dc3545; /* Красная обводка для акцента */
+            border-radius: 5px; /* Скругление углов */
+            transition: background-color 0.3s, border-color 0.3s; /* Плавный переход */
+        }
+        #componentDescription:not(.limit-reached) {
+            background-color: transparent; /* Исходный фон */
+            border: 1px solid #ced4da; /* Стандартная обводка Bootstrap */
+        }
     </style>
 </head>
 <body>
@@ -92,7 +125,9 @@
         </div>
         <div class="form-group">
             <label>Описание</label>
-            <textarea class="form-control" rows="3" id="componentDescription" name="componentDescription"></textarea>
+            <textarea class="form-control" rows="3" id="componentDescription" name="componentDescription" maxlength="250"></textarea>
+            <small id="charCount" class="text-muted">Осталось символов: <span id="charRemaining">250</span></small>
+            <div class="character-limit-tooltip" id="descriptionTooltip">Текст обрезан до 250 символов — слишком много!</div>
         </div>
         <br>
         <button type="submit" class="btn btn-primary">Добавить</button>
@@ -216,6 +251,51 @@
                 usersList = data;
             })
             .catch(error => console.error("Ошибка:", error));
+
+        // Ограничение символов и счётчик для componentDescription
+        const descriptionTextarea = document.getElementById('componentDescription');
+        const charRemaining = document.getElementById('charRemaining');
+        const tooltip = document.getElementById('descriptionTooltip');
+
+        // Обновление счётчика, ограничение ввода и цвет textarea
+        function updateCharCount() {
+            let text = descriptionTextarea.value;
+            if (text.length > 250) {
+                text = text.substring(0, 250);
+                descriptionTextarea.value = text;
+                tooltip.style.display = 'block';
+                setTimeout(() => tooltip.style.display = 'none', 3000); // Скрыть через 3 секунды
+            }
+            charRemaining.textContent = 250 - text.length;
+
+            // Изменение цвета только textarea
+            if (text.length === 250) {
+                descriptionTextarea.classList.add('limit-reached');
+            } else {
+                descriptionTextarea.classList.remove('limit-reached');
+            }
+        }
+
+        // Ограничение ввода вручную
+        descriptionTextarea.addEventListener('input', function(e) {
+            updateCharCount();
+        });
+
+        // Обработка вставки текста (копирование/вставка)
+        descriptionTextarea.addEventListener('paste', function(e) {
+            e.preventDefault();
+            let pastedText = (e.clipboardData || window.clipboardData).getData('text');
+            if (pastedText.length > 250) {
+                pastedText = pastedText.substring(0, 250);
+                tooltip.style.display = 'block';
+                setTimeout(() => tooltip.style.display = 'none', 3000); // Скрыть через 3 секунды
+            }
+            document.execCommand('insertText', false, pastedText);
+            updateCharCount();
+        });
+
+        // Инициализация счётчика при загрузке (если есть начальное значение)
+        updateCharCount();
     });
 
     document.body.addEventListener("htmx:responseError", function (event) {
