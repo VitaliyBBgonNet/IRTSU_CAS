@@ -21,15 +21,6 @@ public class PropertiesSourceService {
     private final DetailsRepository detailsRepository;
     private final GroupRepository groupRepository;
 
-    public PropertiesResponse getProperties() {
-        PropertiesResponse response = new PropertiesResponse();
-        String[] data = {"Apple", "Banana", "Orange"};
-        response.setGroup(data);
-        response.setStatus(data);
-        response.setOrderStatus(data);
-        return response;
-    }
-
     public String getStatus() {
 
         List<String> properties = detailsRepository.getAllStatus().orElseGet(() -> List.of(""));
