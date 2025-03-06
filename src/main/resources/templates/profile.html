@@ -8,7 +8,7 @@
     <style>
         .suggestions {
             position: absolute;
-            z-index: 2000; /* Увеличенный z-index для приоритета над автодополнением браузера */
+            z-index: 2000;
             width: 100%;
             max-height: 200px;
             overflow-y: auto;
@@ -30,34 +30,34 @@
             position: relative;
         }
         .documentation-link {
-            display: inline-block; /* Ограничиваем ширину ссылки */
-            max-width: 100px; /* Ограничиваем ширину ссылки, чтобы не растягивать таблицу */
-            white-space: nowrap; /* Предотвращаем перенос текста */
-            overflow: hidden; /* Скрываем лишний текст, если он не помещается */
-            text-overflow: ellipsis; /* Добавляем троеточие для обрезанного текста */
-            text-decoration: none; /* Убираем подчёркивание по умолчанию */
-            color: #007bff; /* Цвет ссылки, как в Bootstrap */
-            cursor: pointer; /* Курсор для кликабельности */
+            display: inline-block;
+            max-width: 100px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-decoration: none;
+            color: #007bff;
+            cursor: pointer;
         }
         .documentation-link:hover {
-            text-decoration: underline; /* Подчёркивание при наведении */
-            color: #0056b3; /* Темнее при наведении */
+            text-decoration: underline;
+            color: #0056b3;
         }
         #invalidDocumentationModal .modal-body {
-            word-wrap: break-word; /* Разбиваем длинные строки для текста ссылки */
-            max-height: 200px; /* Ограничиваем высоту модального окна */
-            overflow-y: auto; /* Добавляем прокрутку, если текст слишком длинный */
+            word-wrap: break-word;
+            max-height: 200px;
+            overflow-y: auto;
         }
         .character-limit-tooltip {
             display: none;
             position: absolute;
-            background-color: #dc3545; /* Красный фон для акцента */
+            background-color: #dc3545;
             color: white;
             padding: 5px 10px;
             border-radius: 4px;
             font-size: 12px;
-            z-index: 1001; /* Выше других элементов */
-            top: -30px; /* Позиция над полем */
+            z-index: 1001;
+            top: -30px;
             left: 50%;
             transform: translateX(-50%);
         }
@@ -72,14 +72,14 @@
             border-color: #dc3545 transparent transparent transparent;
         }
         #componentDescription.limit-reached, #editComponentDescription.limit-reached {
-            background-color: #ffebee; /* Лёгкий красный фон для textarea */
-            border: 2px solid #dc3545; /* Красная обводка для акцента */
-            border-radius: 5px; /* Скругление углов */
-            transition: background-color 0.3s, border-color 0.3s; /* Плавный переход */
+            background-color: #ffebee;
+            border: 2px solid #dc3545;
+            border-radius: 5px;
+            transition: background-color 0.3s, border-color 0.3s;
         }
         #componentDescription:not(.limit-reached), #editComponentDescription:not(.limit-reached) {
-            background-color: transparent; /* Исходный фон */
-            border: 1px solid #ced4da; /* Стандартная обводка Bootstrap */
+            background-color: transparent;
+            border: 1px solid #ced4da;
         }
     </style>
 </head>
@@ -160,7 +160,7 @@
                 <th>Статус</th>
                 <th>Владелец</th>
                 <th>Арендатор</th>
-                <th>Документация</th> <!-- Добавлен столбец для документации -->
+                <th>Документация</th>
                 <th>Действие</th>
             </tr>
             </thead>
@@ -216,7 +216,6 @@
     </div>
 </div>
 
-<!-- Модальное окно для невалидной ссылки -->
 <div class="modal fade" id="invalidDocumentationModal" tabindex="-1" aria-labelledby="invalidDocumentationModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -224,9 +223,7 @@
                 <h5 class="modal-title" id="invalidDocumentationModalLabel">Невалидная ссылка на документацию</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body" id="invalidDocumentationText">
-                <!-- Текст ссылки будет вставлен здесь -->
-            </div>
+            <div class="modal-body" id="invalidDocumentationText"></div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
             </div>
@@ -254,7 +251,6 @@
             })
             .catch(error => console.error("Ошибка:", error));
 
-        // Ограничение символов и счётчик для componentDescription (основное окно)
         const descriptionTextarea = document.getElementById('componentDescription');
         const charRemaining = document.getElementById('charRemaining');
         const tooltip = document.getElementById('descriptionTooltip');
@@ -267,11 +263,9 @@
                 text = text.substring(0, 250);
                 textarea.value = text;
                 tooltip.style.display = 'block';
-                setTimeout(() => tooltip.style.display = 'none', 3000); // Скрыть через 3 секунды
+                setTimeout(() => tooltip.style.display = 'none', 3000);
             }
             charRemaining.textContent = 250 - text.length;
-
-            // Изменение цвета только textarea
             if (text.length === 250) {
                 textarea.classList.add('limit-reached');
             } else {
@@ -279,53 +273,44 @@
             }
         }
 
-        // Ограничение ввода вручную (основное окно)
         descriptionTextarea.addEventListener('input', function(e) {
             updateCharCount(descriptionTextarea, 'charRemaining', 'descriptionTooltip');
         });
 
-        // Обработка вставки текста (основное окно)
         descriptionTextarea.addEventListener('paste', function(e) {
             e.preventDefault();
             let pastedText = (e.clipboardData || window.clipboardData).getData('text');
             if (pastedText.length > 250) {
                 pastedText = pastedText.substring(0, 250);
-                const tooltip = document.getElementById('descriptionTooltip');
                 tooltip.style.display = 'block';
-                setTimeout(() => tooltip.style.display = 'none', 3000); // Скрыть через 3 секунды
+                setTimeout(() => tooltip.style.display = 'none', 3000);
             }
             document.execCommand('insertText', false, pastedText);
             updateCharCount(descriptionTextarea, 'charRemaining', 'descriptionTooltip');
         });
 
-        // Инициализация счётчика при загрузке (основное окно)
         updateCharCount(descriptionTextarea, 'charRemaining', 'descriptionTooltip');
 
-        // Ограничение символов и счётчик для editComponentDescription (модальное окно)
         const editDescriptionTextarea = document.getElementById('editComponentDescription');
         const editCharRemaining = document.getElementById('editCharRemaining');
         const editTooltip = document.getElementById('editDescriptionTooltip');
 
-        // Ограничение ввода вручную (модальное окно)
         editDescriptionTextarea.addEventListener('input', function(e) {
             updateCharCount(editDescriptionTextarea, 'editCharRemaining', 'editDescriptionTooltip');
         });
 
-        // Обработка вставки текста (модальное окно)
         editDescriptionTextarea.addEventListener('paste', function(e) {
             e.preventDefault();
             let pastedText = (e.clipboardData || window.clipboardData).getData('text');
             if (pastedText.length > 250) {
                 pastedText = pastedText.substring(0, 250);
-                const tooltip = document.getElementById('editDescriptionTooltip');
-                tooltip.style.display = 'block';
-                setTimeout(() => tooltip.style.display = 'none', 3000); // Скрыть через 3 секунды
+                editTooltip.style.display = 'block';
+                setTimeout(() => editTooltip.style.display = 'none', 3000);
             }
             document.execCommand('insertText', false, pastedText);
             updateCharCount(editDescriptionTextarea, 'editCharRemaining', 'editDescriptionTooltip');
         });
 
-        // Инициализация счётчика при загрузке (модальное окно)
         updateCharCount(editDescriptionTextarea, 'editCharRemaining', 'editDescriptionTooltip');
     });
 
@@ -335,7 +320,6 @@
         }
     });
 
-    // Функция для проверки валидности URL
     function isValidUrl(url) {
         if (!url || url.trim() === '') return false;
         try {
@@ -346,7 +330,6 @@
         }
     }
 
-    // Функция для отображения подсказок
     function showSuggestions(inputId, suggestionsId, hiddenId) {
         const input = document.getElementById(inputId);
         const suggestions = document.getElementById(suggestionsId);
@@ -374,7 +357,6 @@
         suggestions.style.display = filteredUsers.length > 0 ? 'block' : 'none';
     }
 
-    // Закрытие подсказок при клике вне поля
     document.addEventListener('click', function(event) {
         const rentedByField = document.getElementById('rentedByField');
         const editRentedByField = document.getElementById('editRentedByField');
@@ -441,7 +423,7 @@
                     if (response.ok) {
                         document.getElementById('addDetailForm').reset();
                         document.getElementById('rentedByField').style.display = 'none';
-                        document.getElementById("loadTableBtn").click(); // Обновляем таблицу после создания
+                        document.getElementById("loadTableBtn").click();
                     } else {
                         throw new Error('Ошибка при отправке данных');
                     }
@@ -455,7 +437,7 @@
         const filterData = {
             name: document.getElementById("componentNameFilter").value.trim(),
             status: document.getElementById("componentStatusFilter").value,
-            documentation: document.getElementById("componentDocumentationFilter").value.trim() // Добавили фильтр по документации
+            documentation: document.getElementById("componentDocumentationFilter").value.trim()
         };
         const token = localStorage.getItem("token");
         fetch("/details/getDetailWitchPaginationFilterForAuthUser", {
@@ -479,7 +461,6 @@
                     let row = document.createElement("tr");
                     let statusColor = component.status === "У владельца" ? "color: green;" :
                         component.status === "В аренде" ? "color: red;" : "";
-                    // Используем tenant напрямую как имя арендатора, если оно не "-"
                     let tenantName = component.tenant === "-" ? "-" : component.tenant || "-";
                     row.innerHTML = `
                         <td><p class="shortened-id">${component.id}</p></td>
@@ -492,7 +473,7 @@
                         <td>
                             <button style="margin: 2px" class="btn btn-danger" data-id="${component.id}">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
-                                    <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"></path>
+                                    <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 0 0 .998-.06l-.5-8.5a.5.5 0 0 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"></path>
                                 </svg>
                             </button>
                             <button style="margin: 2px" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#exampleModal" data-id="${component.id}">
@@ -534,12 +515,49 @@
                 .catch(error => console.error("Ошибка удаления:", error));
         }
 
-        // Обработка клика по ссылке документации
+        const editButton = event.target.closest(".btn-secondary");
+        if (editButton) {
+            const componentId = editButton.getAttribute("data-id");
+            const row = editButton.closest('tr');
+            const componentName = row.cells[1].textContent;
+            const componentDescription = row.cells[2].textContent;
+            const componentStatus = row.cells[3].textContent;
+            const tenantName = row.cells[5].textContent;
+            const componentDocumentation = row.cells[6].querySelector('.documentation-link').getAttribute('data-documentation');
+
+            document.getElementById('editComponentId').value = componentId;
+            document.getElementById('editComponentName').value = componentName;
+            document.getElementById('editComponentDescription').value = componentDescription;
+            document.getElementById('editComponentStatus').value = componentStatus;
+            document.getElementById('editComponentDocumentation').value = componentDocumentation;
+
+            updateCharCount(
+                document.getElementById('editComponentDescription'),
+                'editCharRemaining',
+                'editDescriptionTooltip'
+            );
+
+            const editRentedByField = document.getElementById('editRentedByField');
+            const editRentedByInput = document.getElementById('editRentedBy');
+            const editRentedById = document.getElementById('editRentedById');
+
+            if (componentStatus === "В аренде" && tenantName !== "-") {
+                editRentedByField.style.display = "block";
+                editRentedByInput.value = tenantName;
+                const tenant = usersList.find(user => user.fio === tenantName);
+                editRentedById.value = tenant ? tenant.id : '';
+            } else {
+                editRentedByField.style.display = "none";
+                editRentedByInput.value = '';
+                editRentedById.value = '';
+            }
+        }
+
         const documentationLink = event.target.closest('.documentation-link');
         if (documentationLink) {
             const documentationUrl = documentationLink.getAttribute('data-documentation');
             if (isValidUrl(documentationUrl)) {
-                window.open(documentationUrl, '_blank'); // Открываем в новой вкладке, если URL валиден
+                window.open(documentationUrl, '_blank');
             } else {
                 document.getElementById('invalidDocumentationText').textContent = documentationUrl || 'Ссылка не указана';
                 const modal = new bootstrap.Modal(document.getElementById('invalidDocumentationModal'));
@@ -548,20 +566,55 @@
         }
     });
 
-    document.addEventListener("DOMContentLoaded", function () {
-        const exampleModal = document.getElementById("exampleModal");
-        exampleModal.addEventListener("hidden.bs.modal", function () {
-            document.querySelectorAll(".modal-backdrop").forEach(el => el.remove());
-            document.body.classList.remove("modal-open");
-            document.body.style.paddingRight = "";
-        });
-
-        const invalidModal = document.getElementById("invalidDocumentationModal");
-        invalidModal.addEventListener("hidden.bs.modal", function () {
-            document.querySelectorAll(".modal-backdrop").forEach(el => el.remove());
-            document.body.classList.remove("modal-open");
-            document.body.style.paddingRight = "";
-        });
+    document.getElementById("loadTableBtn").addEventListener("click", function() {
+        const token = localStorage.getItem("token");
+        fetch("/details/getDetailWitchPaginationFilterForAuthUser", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": token ? "Bearer " + token : ""
+            },
+            body: JSON.stringify({})
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Ошибка загрузки данных");
+                }
+                return response.json();
+            })
+            .then(data => {
+                let tableBody = document.getElementById("componentListBody");
+                tableBody.innerHTML = "";
+                data.forEach(component => {
+                    let row = document.createElement("tr");
+                    let statusColor = component.status === "У владельца" ? "color: green;" :
+                        component.status === "В аренде" ? "color: red;" : "";
+                    let tenantName = component.tenant === "-" ? "-" : component.tenant || "-";
+                    row.innerHTML = `
+                        <td><p class="shortened-id">${component.id}</p></td>
+                        <td>${component.name}</td>
+                        <td>${component.description}</td>
+                        <td style="${statusColor}">${component.status}</td>
+                        <td>${component.owner || "—"}</td>
+                        <td>${tenantName}</td>
+                        <td><span class="documentation-link" data-documentation="${component.documentation || ''}">Документация</span></td>
+                        <td>
+                            <button style="margin: 2px" class="btn btn-danger" data-id="${component.id}">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                                    <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 0 0 .998-.06l-.5-8.5a.5.5 0 0 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"></path>
+                                </svg>
+                            </button>
+                            <button style="margin: 2px" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#exampleModal" data-id="${component.id}">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen-fill" viewBox="0 0 16 16">
+                                    <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001z"></path>
+                                </svg>
+                            </button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            })
+            .catch(error => console.error("Ошибка загрузки данных:", error));
     });
 
     document.getElementById("editComponentStatus").addEventListener("change", function () {
@@ -582,6 +635,72 @@
 
     document.getElementById('editRentedBy').addEventListener('input', function() {
         showSuggestions('editRentedBy', 'editRentedBySuggestions', 'editRentedById');
+    });
+
+    document.getElementById('saveChanges').addEventListener('click', function() {
+        const componentId = document.getElementById('editComponentId').value;
+        const componentName = document.getElementById('editComponentName').value;
+        const componentDescription = document.getElementById('editComponentDescription').value;
+        const componentStatus = document.getElementById('editComponentStatus').value;
+        const componentDocumentation = document.getElementById('editComponentDocumentation').value;
+        const tenantId = document.getElementById('editRentedById').value;
+
+        if (componentStatus === "В аренде" && !tenantId) {
+            alert("Пожалуйста, выберите арендатора из списка!");
+            return;
+        }
+
+        const data = {
+            id: componentId,
+            name: componentName,
+            description: componentDescription,
+            status: componentStatus,
+            documentation: componentDocumentation,
+            tenant: componentStatus === "В аренде" ? tenantId : null
+        };
+
+        const token = localStorage.getItem('token');
+        if (token) {
+            fetch('/details/update', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Ошибка при обновлении компонента');
+                    }
+                    return response.json();
+                })
+                .then(() => {
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('exampleModal'));
+                    modal.hide();
+                    document.getElementById("loadTableBtn").click();
+                })
+                .catch(error => {
+                    console.error('Ошибка:', error);
+                    alert('Произошла ошибка при сохранении изменений');
+                });
+        }
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const exampleModal = document.getElementById("exampleModal");
+        exampleModal.addEventListener("hidden.bs.modal", function () {
+            document.querySelectorAll(".modal-backdrop").forEach(el => el.remove());
+            document.body.classList.remove("modal-open");
+            document.body.style.paddingRight = "";
+        });
+
+        const invalidModal = document.getElementById("invalidDocumentationModal");
+        invalidModal.addEventListener("hidden.bs.modal", function () {
+            document.querySelectorAll(".modal-backdrop").forEach(el => el.remove());
+            document.body.classList.remove("modal-open");
+            document.body.style.paddingRight = "";
+        });
     });
 
     document.addEventListener("htmx:configRequest", function(event) {
