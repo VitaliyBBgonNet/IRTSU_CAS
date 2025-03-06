@@ -76,14 +76,21 @@ public class PropertiesSourceService {
         return html.toString();
     }
 
-    public List<UserListResponse> getAllUsers(){
+    public List<UserListResponse> getAllUsers() {
         return userRepository.findAll().stream()
-                .filter(usersEntity -> usersEntity.getRole().equals("Teacher"))
+                .filter(usersEntity -> usersEntity != null &&
+                        usersEntity.getRole() != null &&
+                        usersEntity.getRole().equals("Teacher"))
                 .map(usersEntity -> {
                     UserListResponse userListResponse = new UserListResponse();
                     userListResponse.setId(String.valueOf(usersEntity.getId()));
+
+                    String lastName = usersEntity.getLastName() != null ? usersEntity.getLastName() : "";
+                    String name = usersEntity.getName() != null ? usersEntity.getName() : "";
+                    String surname = usersEntity.getSurname() != null ? usersEntity.getSurname() : "";
+
                     userListResponse.setFio(
-                            usersEntity.getLastName() + " " + usersEntity.getName() + " " + usersEntity.getSurname()
+                            lastName + " " + name + " " + surname
                     );
                     return userListResponse;
                 })
