@@ -3,6 +3,7 @@ package bbgon.irtsu_cas.controllers.restControllers;
 import bbgon.irtsu_cas.constants.ValidationConstants;
 import bbgon.irtsu_cas.dto.request.DetailProperties;
 import bbgon.irtsu_cas.dto.request.FilterDetailRequest;
+import bbgon.irtsu_cas.dto.request.UpdateDetailProperties;
 import bbgon.irtsu_cas.dto.response.*;
 import bbgon.irtsu_cas.services.DetailsService;
 import bbgon.irtsu_cas.services.impl.ResourceService;
@@ -34,6 +35,14 @@ public class DetailsController {
             @RequestBody
             @Valid DetailProperties detail) {
         return ResponseEntity.ok(detailsService.createDetail(detail));
+    }
+
+    @PostMapping("/update")
+    public ResponseEntity<CustomSuccessResponse<SuccessResponse>> updatedDetail(
+            @RequestBody
+            @Valid UpdateDetailProperties updateDetail
+    ){
+        return ResponseEntity.ok(detailsService.updatedDetail(updateDetail));
     }
 
     @GetMapping("/getAllDetailsForAuthUser")

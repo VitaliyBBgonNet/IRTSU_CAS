@@ -439,6 +439,14 @@
             status: document.getElementById("componentStatusFilter").value,
             documentation: document.getElementById("componentDocumentationFilter").value.trim()
         };
+        loadTable(filterData);
+    });
+
+    document.getElementById("loadTableBtn").addEventListener("click", function() {
+        loadTable({});
+    });
+
+    function loadTable(filterData) {
         const token = localStorage.getItem("token");
         fetch("/details/getDetailWitchPaginationFilterForAuthUser", {
             method: "POST",
@@ -461,14 +469,16 @@
                     let row = document.createElement("tr");
                     let statusColor = component.status === "У владельца" ? "color: green;" :
                         component.status === "В аренде" ? "color: red;" : "";
-                    let tenantName = component.tenant === "-" ? "-" : component.tenant || "-";
+                    // Предполагаем, что tenant - это ID пользователя
+                    let tenantId = component.tenant && component.tenant !== "-" ? component.tenant : null;
+                    let tenantName = tenantId ? (usersList.find(user => user.id === tenantId)?.fio || tenantId) : "-";
                     row.innerHTML = `
                         <td><p class="shortened-id">${component.id}</p></td>
                         <td>${component.name}</td>
                         <td>${component.description}</td>
                         <td style="${statusColor}">${component.status}</td>
                         <td>${component.owner || "—"}</td>
-                        <td>${tenantName}</td>
+                        <td data-tenant-id="${tenantId || ''}">${tenantName}</td>
                         <td><span class="documentation-link" data-documentation="${component.documentation || ''}">Документация</span></td>
                         <td>
                             <button style="margin: 2px" class="btn btn-danger" data-id="${component.id}">
@@ -487,7 +497,7 @@
                 });
             })
             .catch(error => console.error("Ошибка загрузки данных:", error));
-    });
+    }
 
     document.getElementById("componentListBody").addEventListener("click", function(event) {
         const deleteEvent = event.target.closest(".btn-danger");
@@ -522,7 +532,8 @@
             const componentName = row.cells[1].textContent;
             const componentDescription = row.cells[2].textContent;
             const componentStatus = row.cells[3].textContent;
-            const tenantName = row.cells[5].textContent;
+            const tenantId = row.cells[5].getAttribute('data-tenant-id'); // Берем ID арендатора из атрибута
+            const tenantName = row.cells[5].textContent; // Отображаемое имя
             const componentDocumentation = row.cells[6].querySelector('.documentation-link').getAttribute('data-documentation');
 
             document.getElementById('editComponentId').value = componentId;
@@ -541,11 +552,11 @@
             const editRentedByInput = document.getElementById('editRentedBy');
             const editRentedById = document.getElementById('editRentedById');
 
-            if (componentStatus === "В аренде" && tenantName !== "-") {
+            if (componentStatus === "В аренде" && tenantId && tenantId !== '-') {
                 editRentedByField.style.display = "block";
-                editRentedByInput.value = tenantName;
-                const tenant = usersList.find(user => user.fio === tenantName);
-                editRentedById.value = tenant ? tenant.id : '';
+                const tenant = usersList.find(user => user.id === tenantId);
+                editRentedByInput.value = tenant ? tenant.fio : tenantName; // Устанавливаем имя из usersList или fallback
+                editRentedById.value = tenantId; // Устанавливаем ID арендатора
             } else {
                 editRentedByField.style.display = "none";
                 editRentedByInput.value = '';
@@ -566,65 +577,17 @@
         }
     });
 
-    document.getElementById("loadTableBtn").addEventListener("click", function() {
-        const token = localStorage.getItem("token");
-        fetch("/details/getDetailWitchPaginationFilterForAuthUser", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": token ? "Bearer " + token : ""
-            },
-            body: JSON.stringify({})
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("Ошибка загрузки данных");
-                }
-                return response.json();
-            })
-            .then(data => {
-                let tableBody = document.getElementById("componentListBody");
-                tableBody.innerHTML = "";
-                data.forEach(component => {
-                    let row = document.createElement("tr");
-                    let statusColor = component.status === "У владельца" ? "color: green;" :
-                        component.status === "В аренде" ? "color: red;" : "";
-                    let tenantName = component.tenant === "-" ? "-" : component.tenant || "-";
-                    row.innerHTML = `
-                        <td><p class="shortened-id">${component.id}</p></td>
-                        <td>${component.name}</td>
-                        <td>${component.description}</td>
-                        <td style="${statusColor}">${component.status}</td>
-                        <td>${component.owner || "—"}</td>
-                        <td>${tenantName}</td>
-                        <td><span class="documentation-link" data-documentation="${component.documentation || ''}">Документация</span></td>
-                        <td>
-                            <button style="margin: 2px" class="btn btn-danger" data-id="${component.id}">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
-                                    <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 0 0 .998-.06l-.5-8.5a.5.5 0 0 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"></path>
-                                </svg>
-                            </button>
-                            <button style="margin: 2px" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#exampleModal" data-id="${component.id}">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen-fill" viewBox="0 0 16 16">
-                                    <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001z"></path>
-                                </svg>
-                            </button>
-                        </td>
-                    `;
-                    tableBody.appendChild(row);
-                });
-            })
-            .catch(error => console.error("Ошибка загрузки данных:", error));
-    });
-
     document.getElementById("editComponentStatus").addEventListener("change", function () {
         const rentedByField = document.getElementById("editRentedByField");
         const editRentedByInput = document.getElementById("editRentedBy");
         const editRentedById = document.getElementById("editRentedById");
         if (this.value === "В аренде") {
             rentedByField.style.display = "block";
-            editRentedByInput.value = '';
-            editRentedById.value = '';
+            // Оставляем текущее значение, если оно уже есть, иначе очищаем
+            if (!editRentedByInput.value) {
+                editRentedByInput.value = '';
+                editRentedById.value = '';
+            }
         } else {
             rentedByField.style.display = "none";
             editRentedByInput.value = '';

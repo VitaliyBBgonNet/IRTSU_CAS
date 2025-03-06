@@ -3,6 +3,7 @@ package bbgon.irtsu_cas.services.impl;
 import bbgon.irtsu_cas.CustomException;
 import bbgon.irtsu_cas.constants.ErrorCodes;
 import bbgon.irtsu_cas.dto.request.DetailProperties;
+import bbgon.irtsu_cas.dto.request.UpdateDetailProperties;
 import bbgon.irtsu_cas.dto.response.*;
 import bbgon.irtsu_cas.entity.DetailsEntity;
 import bbgon.irtsu_cas.entity.QDetailsEntity;
@@ -16,6 +17,7 @@ import bbgon.irtsu_cas.util.QPredicates;
 import com.querydsl.core.types.Predicate;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -45,6 +47,45 @@ public class DetailsServiceImpl implements DetailsService {
     @PersistenceContext
     private final EntityManager entityManager;
     private final UserRepository userRepository;
+
+    @Transactional
+    @Override
+    public CustomSuccessResponse<SuccessResponse> updatedDetail(UpdateDetailProperties updateDetail) {
+
+        if (updateDetail == null) {
+            throw new CustomException(ErrorCodes.UNKNOWN);
+        }
+
+        if (updateDetail.getId() == null || updateDetail.getId().isEmpty()) {
+            throw new CustomException(ErrorCodes.DETAIL_NOT_FOUND);
+        }
+
+        DetailsEntity detailsEntity;
+        detailsEntity = detailsRepository.findById(UUID.fromString(updateDetail.getId()))
+                .orElseThrow(() -> new CustomException(ErrorCodes.DETAIL_NOT_FOUND));
+
+        UsersEntity tenant = null;
+        if (updateDetail.getTenant() != null && !updateDetail.getTenant().isEmpty()) {
+            tenant = userRepository.findById(UUID.fromString(updateDetail.getTenant()))
+                    .orElseThrow(() -> new CustomException(ErrorCodes.USER_NOT_FOUND));
+        }
+
+        detailsEntity.setName(updateDetail.getName() != null ? updateDetail.getName() : detailsEntity.getName());
+        detailsEntity.setDescription(updateDetail.getDescription() != null ? updateDetail.getDescription() : detailsEntity.getDescription());
+        detailsEntity.setDocumentation(updateDetail.getDocumentation() != null ? updateDetail.getDocumentation() : detailsEntity.getDocumentation());
+
+        if (tenant == null) {
+            detailsEntity.setTenant(null);
+            detailsEntity.setStatus("У владельца");
+        } else {
+            detailsEntity.setTenant(tenant);
+            detailsEntity.setStatus(updateDetail.getStatus() != null ? updateDetail.getStatus() : detailsEntity.getStatus());
+        }
+
+        detailsRepository.save(detailsEntity);
+
+        return new CustomSuccessResponse<>(new SuccessResponse());
+    }
 
     @Override
     public CustomSuccessResponse<SuccessResponse> deleteElementById(String idElement) {

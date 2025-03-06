@@ -1,12 +1,15 @@
 package bbgon.irtsu_cas.services;
 
 import bbgon.irtsu_cas.dto.request.DetailProperties;
+import bbgon.irtsu_cas.dto.request.UpdateDetailProperties;
 import bbgon.irtsu_cas.dto.response.*;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface DetailsService {
+
+    CustomSuccessResponse<SuccessResponse> updatedDetail(UpdateDetailProperties updateDetail);
 
     CustomSuccessResponse<SuccessResponse> deleteElementById(String id);
 
