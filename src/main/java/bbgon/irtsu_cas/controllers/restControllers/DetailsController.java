@@ -52,7 +52,22 @@ public class DetailsController {
                 .body(detailsService.getDetailsForAuthUser());
     }
 
-    @PostMapping("/getDetailWitchPaginationFilterForAuthUser")
+    @GetMapping("/getAllDetailsForRent")
+    public ResponseEntity<List<TableElementResponse>> getAllDetailsForRent(
+            @RequestParam(required = false, name = "name") String componentName){
+        return ResponseEntity.ok(resourceService.getAllDetailsForRent(componentName));
+    }
+
+    @PostMapping("/rentThisDetail")
+    public ResponseEntity<SuccessResponse> rentThisDetail(
+            @RequestParam(name = "id") String id) {
+        return ResponseEntity.ok(resourceService.rentThisDetail(id));
+    }
+
+
+
+
+    @PostMapping("/getDetailWitchPaginationFilterForAuthUser")// Поменять на get
     public ResponseEntity<List<TableElementResponse>> getDetailWitchPaginationFilterForAuthUser(
             @RequestBody FilterDetailRequest filterDetailRequest
             ){

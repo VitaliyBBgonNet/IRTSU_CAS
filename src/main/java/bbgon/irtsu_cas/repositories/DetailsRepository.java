@@ -12,4 +12,8 @@ import java.util.UUID;
 public interface DetailsRepository extends JpaRepository<DetailsEntity, UUID>, QuerydslPredicateExecutor<DetailsEntity> {
     @Query("select distinct d.status from DetailsEntity d")
     Optional<List<String>> getAllStatus();
+
+    List<DetailsEntity> findByStatus(String status);
+
+    List<DetailsEntity> findByStatusAndNameIgnoreCase(String status, String name);
 }

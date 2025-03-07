@@ -1,13 +1,14 @@
 package bbgon.irtsu_cas.services.impl;
 
+import bbgon.irtsu_cas.CustomException;
+import bbgon.irtsu_cas.constants.ErrorCodes;
 import bbgon.irtsu_cas.dto.FIO;
 import bbgon.irtsu_cas.dto.request.FilterDetailRequest;
-import bbgon.irtsu_cas.dto.response.CustomSuccessResponse;
-import bbgon.irtsu_cas.dto.response.DetailResponse;
-import bbgon.irtsu_cas.dto.response.PageableResponse;
+import bbgon.irtsu_cas.dto.response.SuccessResponse;
 import bbgon.irtsu_cas.dto.response.TableElementResponse;
 import bbgon.irtsu_cas.entity.DetailsEntity;
 import bbgon.irtsu_cas.entity.QDetailsEntity;
+import bbgon.irtsu_cas.entity.UsersEntity;
 import bbgon.irtsu_cas.repositories.DetailsRepository;
 import bbgon.irtsu_cas.services.UserService;
 import bbgon.irtsu_cas.util.QPredicates;
@@ -19,6 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -97,7 +99,7 @@ public class ResourceServiceImpl implements ResourceService {
     }
 
     public List<TableElementResponse> getDetailWitchPaginationFilterForAuthUser(
-            FilterDetailRequest filterDetailRequest){
+            FilterDetailRequest filterDetailRequest) {
 
         UUID uuidAuthUser = userService.getUserIdByToken();
 
@@ -108,6 +110,52 @@ public class ResourceServiceImpl implements ResourceService {
                 filterDetailRequest.getStatus(),
                 null,
                 uuidAuthUser);
+    }
+
+//    UsersEntity thisUser = userService.findUserEntityById(userService.getUserIdByToken());
+//        if(thisUser.getRole().equals("Admin")){
+//        throw new CustomException(ErrorCodes.ACCESS_DENIED);
+//    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<TableElementResponse> getAllDetailsForRent(String componentName) {
+
+        List<DetailsEntity> detailsEntities;
+
+        if (componentName != null) {
+            detailsEntities = detailsRepository.findByStatusAndNameIgnoreCase("У владельца", componentName);
+        } else {
+            detailsEntities = detailsRepository.findByStatus("У владельца");
+        }
+
+        return detailsEntities.stream().map(
+                detailsEntity -> {
+                    TableElementResponse tableElementResponse = new TableElementResponse();
+                    tableElementResponse.setId(detailsEntity.getId());
+                    tableElementResponse.setName(detailsEntity.getName());
+                    tableElementResponse.setDescription(detailsEntity.getDescription());
+                    tableElementResponse.setDocumentation(detailsEntity.getDocumentation());
+                    return tableElementResponse;
+                }
+        ).toList();
+    }
+
+    @Override
+    @Transactional
+    public SuccessResponse rentThisDetail(String id) {
+
+        UsersEntity thisUser = userService.findUserEntityById(userService.getUserIdByToken());
+        if(thisUser.getRole().equals("Admin")){
+        throw new CustomException(ErrorCodes.ACCESS_DENIED);
+    }
+        DetailsEntity detailsEntity = detailsRepository.findById(UUID.fromString(id))
+                .orElseThrow(() -> new CustomException(ErrorCodes.USER_NOT_FOUND));
+
+        detailsEntity.setStatus("В аренде");
+        detailsEntity.setTenant(thisUser);
+        detailsRepository.save(detailsEntity);
+        return new SuccessResponse("Компонент успешно взят в аренду");
     }
 
     @Override

@@ -1,6 +1,7 @@
 package bbgon.irtsu_cas.services.impl;
 
 import bbgon.irtsu_cas.dto.request.FilterDetailRequest;
+import bbgon.irtsu_cas.dto.response.SuccessResponse;
 import bbgon.irtsu_cas.dto.response.TableElementResponse;
 
 import java.util.List;
@@ -16,4 +17,8 @@ public interface ResourceService {
             String ownerFullName,  UUID ownerId);
     public List<TableElementResponse> getDetailWitchPaginationFilterForAuthUser(
             FilterDetailRequest filterDetailRequest);
+
+    List<TableElementResponse> getAllDetailsForRent(String componentName);
+
+    SuccessResponse rentThisDetail (String id);
 }

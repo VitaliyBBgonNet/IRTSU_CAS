@@ -1,12 +1,13 @@
 package bbgon.irtsu_cas.dto.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.*;
 
 import java.util.UUID;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
+@NoArgsConstructor
 public class TableElementResponse {
     private UUID id;
 
