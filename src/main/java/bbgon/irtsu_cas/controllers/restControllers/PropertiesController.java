@@ -19,20 +19,6 @@ public class PropertiesController {
 
     private final PropertiesSourceService serviceProperties;
 
-    @GetMapping("/getAll")
-    public  ResponseEntity<String> getAllProperties() {
-
-        PropertiesResponse response = serviceProperties.getProperties();
-
-        StringBuilder html = new StringBuilder();
-
-        for (String status : response.getStatus()) {
-            html.append("<option value=\"").append(status).append("\">").append(status).append("</option>");
-        }
-
-        return ResponseEntity.ok(html.toString());
-    }
-
     @GetMapping("/getStatus")
     public ResponseEntity<String> getStatus() {
         return ResponseEntity.ok(serviceProperties.getStatus());
