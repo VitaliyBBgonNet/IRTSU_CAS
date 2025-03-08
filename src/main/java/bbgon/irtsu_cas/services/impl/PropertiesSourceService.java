@@ -16,7 +16,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PropertiesSourceService {
 
-    private final UserService userService;
     private final UserRepository userRepository;
     private final DetailsRepository detailsRepository;
     private final GroupRepository groupRepository;
@@ -55,7 +54,6 @@ public class PropertiesSourceService {
         return htmlBuilder(groupNames);
     }
 
-    //тут заполняю компонент html и возвращаю его
     private String htmlBuilder(List<String> properties) {
 
         StringBuilder html = new StringBuilder();
