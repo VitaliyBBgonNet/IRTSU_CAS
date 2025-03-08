@@ -26,8 +26,6 @@ import java.util.UUID;
 public class AdminController {
 
     private final AdminService adminService;
-    private final ResourceService resourceService;
-    private final UserService userService;
 
     @PutMapping("/updateUser")
     public ResponseEntity<CustomSuccessResponse<SuccessResponse>> updateUserData(
@@ -50,53 +48,5 @@ public class AdminController {
     @DeleteMapping("/deleteThisUser")
     public ResponseEntity<CustomSuccessResponse<SuccessResponse>> deleteDetail(@RequestBody Map<String, UUID> requestBody) {
         return ResponseEntity.ok(adminService.deleteUserById(requestBody.get("id").toString()));
-    }
-
-    @PostMapping("/createGroup")
-    public ResponseEntity<CustomSuccessResponse<SuccessResponse>> createNewGroup(
-            @RequestBody NewGroupRequest newGroupRequest ) {
-        return ResponseEntity.ok(adminService.createNewGroup(newGroupRequest));
-    }
-
-    @PostMapping("/deleteGroup")
-    public ResponseEntity<CustomSuccessResponse<SuccessResponse>> deleteGroup(
-            @RequestParam UUID uuid,
-            @RequestParam String name) {
-        return ResponseEntity.ok(adminService.deleteGroup(uuid, name));
-    }
-
-    @PostMapping("/editGroup")
-    public ResponseEntity<CustomSuccessResponse<SuccessResponse>> createNewGroup(
-            @RequestParam UUID uuid,
-            @RequestBody GroupEditDataRequest groupEditDataRequest ) {
-        return ResponseEntity.ok(adminService.editGroupProperties(uuid, groupEditDataRequest));
-    }
-
-    @PostMapping("/addDetailInGroup")
-    public ResponseEntity<CustomSuccessResponse<SuccessResponse>> addDetailInGroup(
-            @RequestParam UUID uuidGroup,
-            @RequestParam UUID uuidDetail) {
-        return ResponseEntity.ok(adminService.addDetailsInOwnGroup(uuidGroup, uuidDetail));
-    }
-
-    @PostMapping("/addUserInOwnGroup")
-    public ResponseEntity<CustomSuccessResponse<SuccessResponse>> addUserInOwnGroup(
-            @RequestParam UUID uuidUser,
-            @RequestParam UUID uuidGroup) {
-        return ResponseEntity.ok(adminService.addUserInGroup(uuidUser, uuidGroup));
-    }
-
-    @PostMapping("/deleteUserFromOwnGroup")
-    public ResponseEntity<CustomSuccessResponse<SuccessResponse>> deleteUserFromOwnGroup(
-            @RequestParam UUID uuidUser,
-            @RequestParam UUID uuidGroup) {
-        return ResponseEntity.ok(adminService.deleteUserFromOwnGroup(uuidUser, uuidGroup));
-    }
-
-    @PostMapping("/deleteDetailFromOwnGroup")
-    public ResponseEntity<CustomSuccessResponse<SuccessResponse>> deleteDetailFromOwnGroup(
-            @RequestParam UUID uuidDetail,
-            @RequestParam UUID uuidGroup) {
-        return ResponseEntity.ok(adminService.deleteDetailFromOwnGroup(uuidDetail, uuidGroup));
     }
 }

@@ -12,4 +12,8 @@ public interface StringConstants {
     String ERROR_HEAD = "errorHead";
 
     String RENTED = "RENTED";
+
+    String TEACHER_ROLE = "Teacher";
+
+    String ADMIN_ROLE = "Admin";
 }

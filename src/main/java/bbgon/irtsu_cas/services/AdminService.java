@@ -20,18 +20,4 @@ public interface AdminService {
     List<Users> getAllUsersForAdmin();
 
     CustomSuccessResponse<SuccessResponse> deleteUserById(String id);
-
-    CustomSuccessResponse<SuccessResponse> createNewGroup(NewGroupRequest newGroupRequest);
-
-    CustomSuccessResponse<SuccessResponse> deleteGroup(UUID groupId, String groupName);
-
-    CustomSuccessResponse<SuccessResponse> editGroupProperties(UUID groupId, GroupEditDataRequest groupEditDataRequest);
-
-    CustomSuccessResponse<SuccessResponse> addDetailsInOwnGroup(UUID groupId, UUID detailId);
-
-    CustomSuccessResponse<SuccessResponse> addUserInGroup(UUID uuidUser , UUID uuidGroup);
-
-    CustomSuccessResponse<SuccessResponse> deleteUserFromOwnGroup(UUID uuidUser , UUID uuidGroup);
-
-    CustomSuccessResponse<SuccessResponse> deleteDetailFromOwnGroup(UUID uuidDetail, UUID uuidGroup);
 }
