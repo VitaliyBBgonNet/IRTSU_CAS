@@ -13,4 +13,8 @@ public class RentPageController {
         return "rent";
     }
 
+    @GetMapping("/returnComponentsPage")
+    public String returnComponents() {
+        return "returnComponents";
+    }
 }
