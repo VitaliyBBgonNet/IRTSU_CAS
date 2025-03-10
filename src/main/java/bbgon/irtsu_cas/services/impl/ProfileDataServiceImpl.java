@@ -14,6 +14,6 @@ public class ProfileDataServiceImpl {
 
     public String getProfileFIO(){
         UsersEntity usersEntity = userService.findUserEntityById(userService.getUserIdByToken());
-        return usersEntity.getName()+" "+usersEntity.getLastName()+" "+usersEntity.getSurname();
+        return usersEntity.getLastName()+" "+usersEntity.getName()+" "+usersEntity.getSurname();
     }
 }
