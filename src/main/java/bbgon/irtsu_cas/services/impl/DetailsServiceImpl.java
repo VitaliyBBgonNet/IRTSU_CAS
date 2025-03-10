@@ -2,6 +2,7 @@ package bbgon.irtsu_cas.services.impl;
 
 import bbgon.irtsu_cas.CustomException;
 import bbgon.irtsu_cas.constants.ErrorCodes;
+import bbgon.irtsu_cas.constants.StringConstants;
 import bbgon.irtsu_cas.dto.request.DetailProperties;
 import bbgon.irtsu_cas.dto.request.UpdateDetailProperties;
 import bbgon.irtsu_cas.dto.response.*;
@@ -47,6 +48,57 @@ public class DetailsServiceImpl implements DetailsService {
     @PersistenceContext
     private final EntityManager entityManager;
     private final UserRepository userRepository;
+
+    @Override
+    @Transactional
+    public SuccessResponse returnComponent(String id) {
+
+        UsersEntity thisUser = userService.findUserEntityById(userService.getUserIdByToken());
+
+        if(thisUser == null) {
+            throw new CustomException(ErrorCodes.USER_NOT_FOUND);
+        }
+
+        if(thisUser.getRole().equals(StringConstants.ADMIN_ROLE)){
+            throw new CustomException(ErrorCodes.ACCESS_DENIED);
+        }
+
+        DetailsEntity detail = detailsRepository.findById(UUID.fromString(id))
+                .orElseThrow(() -> new CustomException(ErrorCodes.DETAIL_NOT_FOUND));
+
+        if(detail.getTenant().getId() != thisUser.getId()){
+            throw new CustomException(ErrorCodes.ACCESS_DENIED);
+        }
+
+        detail.setModerationStatus("MODERATION");
+        detailsRepository.save(detail);
+
+        return new SuccessResponse("Компонент отправлен на модерацию"+ detail.getId());
+    }
+
+    @Override
+    public List<TableElementForReturnOwner> getMyRentedComponents() {
+
+        UsersEntity thisUser = userService.findUserEntityById(userService.getUserIdByToken());
+
+        if(thisUser == null) {
+            throw new CustomException(ErrorCodes.USER_NOT_FOUND);
+        }
+
+        if(thisUser.getRole().equals(StringConstants.ADMIN_ROLE)){
+            throw new CustomException(ErrorCodes.ACCESS_DENIED);
+        }
+
+        return detailsRepository.findAllByTenant_Id(thisUser.getId()).stream()
+                .map(detailsEntity -> {
+                    var tableElementResponse = new TableElementForReturnOwner();
+                    tableElementResponse.setId(detailsEntity.getId());
+                    tableElementResponse.setName(Optional.ofNullable(detailsEntity.getName()).orElse(" "));
+                    tableElementResponse.setDescription(Optional.ofNullable(detailsEntity.getDescription()).orElse("-"));
+                    tableElementResponse.setModerationStatus(Optional.ofNullable(detailsEntity.getModerationStatus()).orElse("-"));
+                    return tableElementResponse;
+                }).toList();
+    }
 
     @Transactional
     @Override

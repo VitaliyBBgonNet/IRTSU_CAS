@@ -9,6 +9,10 @@ import java.util.UUID;
 
 public interface DetailsService {
 
+    SuccessResponse returnComponent(String id);
+
+    List<TableElementForReturnOwner> getMyRentedComponents();
+
     CustomSuccessResponse<SuccessResponse> updatedDetail(UpdateDetailProperties updateDetail);
 
     CustomSuccessResponse<SuccessResponse> deleteElementById(String id);

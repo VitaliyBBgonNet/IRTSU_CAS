@@ -13,6 +13,7 @@
             display: inline-block;
             margin-left: 5px;
             vertical-align: middle;
+            cursor: pointer; /* Интерактивный курсор */
         }
         .status-yellow { background-color: #ffc107; }  /* На модерации */
         .status-red { background-color: #dc3545; }     /* Не на модерации */
@@ -101,8 +102,12 @@
             .catch(error => console.error("Ошибка:", error));
     }
 
-    function getStatusClass(status) {
-        return status === 'MODERATION' ? 'status-yellow' : 'status-red';
+    function getStatusClass(moderationStatus) {
+        return moderationStatus === 'MODERATION' ? 'status-yellow' : 'status-red';
+    }
+
+    function getTooltipText(moderationStatus) {
+        return moderationStatus === 'MODERATION' ? 'На модерации' : 'Не отправлен на модерацию';
     }
 
     function showComponentSuggestions() {
@@ -117,7 +122,7 @@
         }
 
         const filteredComponents = componentsList.filter(component =>
-            component.name.toLowerCase().includes(query)
+            component.name && component.name.toLowerCase().includes(query) && component.name !== " "
         );
 
         filteredComponents.forEach(component => {
@@ -137,6 +142,11 @@
     document.addEventListener("DOMContentLoaded", function() {
         fetchRentedComponents();
         loadTable();
+        // Инициализация tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
 
         document.getElementById("componentNameFilter").addEventListener("input", showComponentSuggestions);
 
@@ -178,26 +188,31 @@
                     let row = document.createElement("tr");
                     row.innerHTML = `
           <td>${component.id}</td>
-          <td>${component.name}</td>
-          <td>${component.description}</td>
+          <td>${component.name === " " ? "Не указано" : component.name}</td>
+          <td>${component.description === "-" ? "Не указано" : component.description}</td>
           <td>
             <button
               style="margin: 2px"
-              class="btn btn-warning return-btn"
+              class="btn return-btn ${component.moderationStatus === 'MODERATION' ? 'btn-secondary' : 'btn-warning'}"
               data-id="${component.id}"
-              ${component.status === 'MODERATION' ? 'disabled' : ''}>
+              ${component.moderationStatus === 'MODERATION' ? 'disabled' : ''}>
               Вернуть
             </button>
             <button
               style="margin: 2px"
-              class="btn btn-danger cancel-btn"
+              class="btn cancel-btn ${component.moderationStatus !== 'MODERATION' ? 'btn-secondary' : 'btn-danger'}"
               data-id="${component.id}"
-              ${component.status !== 'MODERATION' ? 'disabled' : ''}>
+              ${component.moderationStatus !== 'MODERATION' ? 'disabled' : ''}>
               Отмена
             </button>
           </td>
           <td>
-            <span class="status-indicator ${getStatusClass(component.status)}"></span>
+            <span
+              class="status-indicator ${getStatusClass(component.moderationStatus)}"
+              data-bs-toggle="tooltip"
+              data-bs-placement="top"
+              data-bs-title="${getTooltipText(component.moderationStatus)}">
+            </span>
           </td>
         `;
                     tableBody.appendChild(row);
@@ -246,7 +261,7 @@
                     return response.json();
                 })
                 .then(data => {
-                    alert("Компонент отправлен на модерацию");
+                    alert(data.message || "Компонент успешно отправлен на модерацию");
                     loadTable();
                 })
                 .catch(error => {
@@ -278,7 +293,7 @@
                     return response.json();
                 })
                 .then(data => {
-                    alert("Модерация компонента отменена");
+                    alert(data.message || "Модерация компонента отменена");
                     loadTable();
                 })
                 .catch(error => {

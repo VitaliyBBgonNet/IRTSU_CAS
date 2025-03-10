@@ -37,6 +37,17 @@ public class DetailsController {
         return ResponseEntity.ok(detailsService.createDetail(detail));
     }
 
+    @GetMapping("/getMyRentedComponents")
+    public ResponseEntity<List<TableElementForReturnOwner>> getMyRentedComponents(){
+        return ResponseEntity.ok(detailsService.getMyRentedComponents());
+    }
+
+    @PostMapping("/returnComponent")
+    public ResponseEntity<SuccessResponse> returnComponent(
+            @RequestParam(name = "id") String id){
+        return ResponseEntity.ok(detailsService.returnComponent(id));
+    }
+
     @PostMapping("/update")
     public ResponseEntity<CustomSuccessResponse<SuccessResponse>> updatedDetail(
             @RequestBody

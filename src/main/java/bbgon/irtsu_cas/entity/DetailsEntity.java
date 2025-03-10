@@ -38,5 +38,7 @@ public class DetailsEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tenant_id")
     private UsersEntity tenant;
+
+    private String moderationStatus;
 }
 
