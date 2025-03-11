@@ -39,4 +39,9 @@ public class AuthPageController {
         model.addAttribute("registerForm", new RegistrationUserRequest());
         return "registration-user";
     }
+
+    @GetMapping("/takeComponent")
+    public String takeComponent() {
+        return "takeComponent";
+    }
 }

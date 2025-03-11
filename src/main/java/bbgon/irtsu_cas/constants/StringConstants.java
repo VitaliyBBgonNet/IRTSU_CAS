@@ -18,4 +18,8 @@ public interface StringConstants {
     String ADMIN_ROLE = "Admin";
 
     String CANCEL_MODERATION = "CANCEL";
+
+    String MODERATION = "MODERATION";
+
+    String APPROVED = "APPROVED";
 }

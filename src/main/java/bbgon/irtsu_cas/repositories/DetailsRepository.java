@@ -18,4 +18,6 @@ public interface DetailsRepository extends JpaRepository<DetailsEntity, UUID>, Q
     List<DetailsEntity> findByStatusAndNameIgnoreCase(String status, String name);
 
     List<DetailsEntity> findAllByTenant_Id(UUID tenantId);
+
+    List<DetailsEntity> findByModerationStatus(String moderationStatus);
 }

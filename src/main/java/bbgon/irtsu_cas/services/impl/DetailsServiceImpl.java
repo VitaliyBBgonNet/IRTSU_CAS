@@ -66,7 +66,7 @@ public class DetailsServiceImpl implements DetailsService {
             throw new CustomException(ErrorCodes.ACCESS_DENIED);
         }
 
-        detail.setModerationStatus("MODERATION");
+        detail.setModerationStatus(StringConstants.MODERATION);
         detailsRepository.save(detail);
 
         return new SuccessResponse("Компонент отправлен на модерацию"+ detail.getId());
@@ -93,27 +93,53 @@ public class DetailsServiceImpl implements DetailsService {
     }
 
     @Override
+    @Transactional
+    public SuccessResponse approveComponent(String componentId) {
+
+        UsersEntity thisUser = userService.thisUser();
+
+        DetailsEntity detail = detailsRepository.findById(UUID.fromString(componentId))
+                .orElseThrow(() -> new CustomException(ErrorCodes.DETAIL_NOT_FOUND));
+
+        if (!thisUser.getRole().equals(StringConstants.ADMIN_ROLE)) {
+            throw new CustomException(ErrorCodes.ACCESS_DENIED);
+        }
+
+        detail.setModerationStatus(StringConstants.APPROVED);
+        detail.setTenant(null);
+
+        detailsRepository.save(detail);
+
+        return new SuccessResponse("Подтверждено");
+    }
+
+    @Override
+    public List<TableElementForReturnOwner> getComponentFromModeration() {
+
+        UsersEntity thisUser = userService.thisUser();
+
+        if(!thisUser.getRole().equals(StringConstants.ADMIN_ROLE)){
+            throw new CustomException(ErrorCodes.ACCESS_DENIED);
+        }
+
+        List<DetailsEntity> detailsEntity = detailsRepository.findByModerationStatus(StringConstants.MODERATION);
+
+        return listForTableFromLitEntity(detailsEntity);
+    }
+
+    @Override
     public List<TableElementForReturnOwner> getMyRentedComponents() {
 
         UsersEntity thisUser = userService.findUserEntityById(userService.getUserIdByToken());
-
-        if(thisUser == null) {
-            throw new CustomException(ErrorCodes.USER_NOT_FOUND);
-        }
 
         if(thisUser.getRole().equals(StringConstants.ADMIN_ROLE)){
             throw new CustomException(ErrorCodes.ACCESS_DENIED);
         }
 
-        return detailsRepository.findAllByTenant_Id(thisUser.getId()).stream()
-                .map(detailsEntity -> {
-                    var tableElementResponse = new TableElementForReturnOwner();
-                    tableElementResponse.setId(detailsEntity.getId());
-                    tableElementResponse.setName(Optional.ofNullable(detailsEntity.getName()).orElse(" "));
-                    tableElementResponse.setDescription(Optional.ofNullable(detailsEntity.getDescription()).orElse("-"));
-                    tableElementResponse.setModerationStatus(Optional.ofNullable(detailsEntity.getModerationStatus()).orElse("-"));
-                    return tableElementResponse;
-                }).toList();
+        List<DetailsEntity> listDetailsEntity = detailsRepository.findAllByTenant_Id(thisUser.getId());
+
+
+        return listForTableFromLitEntity(listDetailsEntity);
     }
 
     @Transactional
@@ -361,5 +387,17 @@ public class DetailsServiceImpl implements DetailsService {
         ownerDTO.setEmail(detailsEntity.getOwner().getEmail());
         ownerDTO.setPhone(detailsEntity.getOwner().getPhone());
         return ownerDTO;
+    }
+
+    private List<TableElementForReturnOwner> listForTableFromLitEntity(List<DetailsEntity> listDetailsEntity) {
+        return listDetailsEntity.stream()
+                .map(detail -> {
+                    var tableElementResponse = new TableElementForReturnOwner();
+                    tableElementResponse.setId(detail.getId());
+                    tableElementResponse.setName(Optional.ofNullable(detail.getName()).orElse(" "));
+                    tableElementResponse.setDescription(Optional.ofNullable(detail.getDescription()).orElse("-"));
+                    tableElementResponse.setModerationStatus(Optional.ofNullable(detail.getModerationStatus()).orElse("-"));
+                    return tableElementResponse;
+                }).toList();
     }
 }

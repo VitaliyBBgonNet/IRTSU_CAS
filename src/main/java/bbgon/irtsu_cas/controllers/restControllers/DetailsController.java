@@ -42,18 +42,31 @@ public class DetailsController {
     public ResponseEntity<SuccessResponse> cancelModeration(
             @RequestParam(name = "id")
             @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
-                    message = "ID must be a valid UUID in the format 8-4-4-4-12 (e.g., 97600579-8050-4558-b743-37ffa249df52)") String id){
+                    message = "ID must be a valid UUID in the format 8-4-4-4-12 (e.g., 97600579-8050-4558-b743-37ffa249df52)") String id) {
         return ResponseEntity.ok(detailsService.cancelModeration(id));
     }
 
+    @PostMapping("/approveComponent")
+    public ResponseEntity<SuccessResponse> approveComponent(
+            @RequestParam(name = "id")
+            @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+                    message = "ID must be a valid UUID in the format 8-4-4-4-12 (e.g., 97600579-8050-4558-b743-37ffa249df52)") String id) {
+                return ResponseEntity.ok(detailsService.approveComponent(id));
+    }
+
+    @GetMapping("/getComponentFromModeration")
+    public ResponseEntity<List<TableElementForReturnOwner>> getComponentFromModeration() {
+        return ResponseEntity.ok(detailsService.getComponentFromModeration());
+    }
+
     @GetMapping("/getMyRentedComponents")
-    public ResponseEntity<List<TableElementForReturnOwner>> getMyRentedComponents(){
+    public ResponseEntity<List<TableElementForReturnOwner>> getMyRentedComponents() {
         return ResponseEntity.ok(detailsService.getMyRentedComponents());
     }
 
     @PostMapping("/returnComponent")
     public ResponseEntity<SuccessResponse> returnComponent(
-            @RequestParam(name = "id") String id){
+            @RequestParam(name = "id") String id) {
         return ResponseEntity.ok(detailsService.returnComponent(id));
     }
 
@@ -61,12 +74,12 @@ public class DetailsController {
     public ResponseEntity<CustomSuccessResponse<SuccessResponse>> updatedDetail(
             @RequestBody
             @Valid UpdateDetailProperties updateDetail
-    ){
+    ) {
         return ResponseEntity.ok(detailsService.updatedDetail(updateDetail));
     }
 
     @GetMapping("/getAllDetailsForAuthUser")
-    public ResponseEntity<List<TableElementResponse>> getAllDetailsForAuthUser(){
+    public ResponseEntity<List<TableElementResponse>> getAllDetailsForAuthUser() {
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_TYPE, "application/json")
                 .body(detailsService.getDetailsForAuthUser());
@@ -74,7 +87,7 @@ public class DetailsController {
 
     @GetMapping("/getAllDetailsForRent")
     public ResponseEntity<List<TableElementResponse>> getAllDetailsForRent(
-            @RequestParam(required = false, name = "name") String componentName){
+            @RequestParam(required = false, name = "name") String componentName) {
         return ResponseEntity.ok(resourceService.getAllDetailsForRent(componentName));
     }
 
@@ -85,12 +98,10 @@ public class DetailsController {
     }
 
 
-
-
     @PostMapping("/getDetailWitchPaginationFilterForAuthUser")// Поменять на get
     public ResponseEntity<List<TableElementResponse>> getDetailWitchPaginationFilterForAuthUser(
             @RequestBody FilterDetailRequest filterDetailRequest
-            ){
+    ) {
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_TYPE, "application/json")
                 .body(resourceService.getDetailWitchPaginationFilterForAuthUser(filterDetailRequest));

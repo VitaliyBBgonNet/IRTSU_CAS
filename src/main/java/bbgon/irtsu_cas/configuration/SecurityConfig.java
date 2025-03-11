@@ -27,6 +27,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/docs").permitAll()
+                        .requestMatchers("authUser/takeComponent").permitAll()
                         .requestMatchers("/addNewDetail").permitAll()
                         .requestMatchers("/admin/newUsersPage").permitAll()
                         .requestMatchers("/docs").permitAll()
