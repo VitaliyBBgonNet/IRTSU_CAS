@@ -9,4 +9,6 @@ public interface AuthService {
     CustomSuccessResponse<LoginUserResponse> registrationUser(RegistrationUserRequest requestForRegistration);
 
     CustomSuccessResponse<LoginUserResponse> authorizationUser(AuthUserRequest requestForAuthorization);
+
+    String getRole();
 }

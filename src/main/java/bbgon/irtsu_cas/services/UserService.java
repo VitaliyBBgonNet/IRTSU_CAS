@@ -10,4 +10,6 @@ public interface UserService {
     UsersEntity findUserEntityById(UUID id);
 
     UUID getUserIdByToken();
+
+    UsersEntity thisUser();
 }

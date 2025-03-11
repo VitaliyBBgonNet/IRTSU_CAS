@@ -2,6 +2,7 @@ package bbgon.irtsu_cas.services.impl;
 
 import bbgon.irtsu_cas.CustomException;
 import bbgon.irtsu_cas.constants.ErrorCodes;
+import bbgon.irtsu_cas.constants.StringConstants;
 import bbgon.irtsu_cas.dto.request.AuthUserRequest;
 import bbgon.irtsu_cas.dto.request.RegistrationUserRequest;
 import bbgon.irtsu_cas.dto.response.CustomSuccessResponse;
@@ -10,17 +11,22 @@ import bbgon.irtsu_cas.entity.UsersEntity;
 import bbgon.irtsu_cas.repositories.AuthRepository;
 import bbgon.irtsu_cas.security.TokenSecurity;
 import bbgon.irtsu_cas.services.AuthService;
+import bbgon.irtsu_cas.services.UserService;
 import bbgon.irtsu_cas.utils.AESUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
+import java.util.Objects;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
     private final AuthRepository authRepository;
+
+    private final UserService userService;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -71,5 +77,11 @@ public class AuthServiceImpl implements AuthService {
         LoginUserResponse loginUserResponse = new LoginUserResponse();
         loginUserResponse.setToken(jwtToken.generateToken(usersEntity.getId()));
         return new CustomSuccessResponse<>(loginUserResponse);
+    }
+
+    @Override
+    public String getRole() {
+        UsersEntity thisUser = userService.thisUser();
+        return Optional.of(thisUser.getRole()).orElse("UNKNOWN");
     }
 }

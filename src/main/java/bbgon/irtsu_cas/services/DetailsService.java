@@ -11,6 +11,8 @@ public interface DetailsService {
 
     SuccessResponse returnComponent(String id);
 
+    SuccessResponse cancelModeration(String id);
+
     List<TableElementForReturnOwner> getMyRentedComponents();
 
     CustomSuccessResponse<SuccessResponse> updatedDetail(UpdateDetailProperties updateDetail);

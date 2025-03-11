@@ -34,9 +34,13 @@ public class UserServiceImpl implements UserService {
         return UUID.fromString(((CustomUserDetails) authentication.getPrincipal()).getUsername());
     }
 
+    @Override
+    public UsersEntity thisUser() {
+        return findUserEntityById(getUserIdByToken());
+    }
+
     private UsersEntity getUserOrThrowException(UUID uuid) {
-        UsersEntity usersEntity = userRepository.findById(uuid)
+        return userRepository.findById(uuid)
                 .orElseThrow(() -> new CustomException(ErrorCodes.USER_NOT_FOUND));
-        return usersEntity;
     }
 }

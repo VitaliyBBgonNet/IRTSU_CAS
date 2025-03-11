@@ -7,7 +7,6 @@ import bbgon.irtsu_cas.dto.response.LoginUserResponse;
 import bbgon.irtsu_cas.services.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -34,5 +33,8 @@ public class AuthController {
         return ResponseEntity.ok(authService.authorizationUser(authUserRequest));
     }
 
-
+    @GetMapping(value = "/role")
+    public ResponseEntity<String> getRole() {
+        return ResponseEntity.ok(authService.getRole());
+    }
 }

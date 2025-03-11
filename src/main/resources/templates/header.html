@@ -1,29 +1,87 @@
-<header th:fragment="header">
+<header>
     <div class="d-flex flex-column flex-md-row align-items-center pb-3 mb-4 border-bottom">
         <a href="https://rtf.sfedu.ru/" class="d-flex align-items-center link-body-emphasis text-decoration-none">
             <span class="fs-4">IRTSU CAS</span>
         </a>
 
-        <nav class="d-inline-flex mt-2 mt-md-0 ms-md-auto">
-            <a class="me-3 py-2 link-body-emphasis text-decoration-none" href="/authUser/profile">Профиль</a>
-            <a class="me-3 py-2 link-body-emphasis text-decoration-none" href="/IRTSU/elements">Комплектующие IRTSU</a>
-            <a class="me-3 py-2 link-body-emphasis text-decoration-none" href="/admin/newUsersPage">Пользователи</a>
-            <a class="me-3 py-2 link-body-emphasis text-decoration-none" href="/authUser/rent">Аренда</a>
-            <a class="me-3 py-2 link-body-emphasis text-decoration-none" href="/authUser/returnComponentsPage">Сдача комплектующих</a>
+        <nav id="navMenu" class="d-inline-flex mt-2 mt-md-0 ms-md-auto">
+            <a id="profileLink" class="me-3 py-2 link-body-emphasis text-decoration-none" href="/authUser/profile">Профиль</a>
+            <a id="componentsLink" class="me-3 py-2 link-body-emphasis text-decoration-none" href="/IRTSU/elements">Комплектующие IRTSU</a>
+            <a id="usersLink" class="me-3 py-2 link-body-emphasis text-decoration-none" href="/admin/newUsersPage">Пользователи</a>
+            <a id="rentLink" class="me-3 py-2 link-body-emphasis text-decoration-none" href="/authUser/rent">Аренда</a>
+            <a id="returnComponentsLink" class="me-3 py-2 link-body-emphasis text-decoration-none" href="/authUser/returnComponentsPage">Сдача комплектующих</a>
         </nav>
 
         <button id="logoutBtn" class="btn btn-danger">Выйти</button>
-
     </div>
 
     <script>
-        // Слушаем событие клика на кнопку выхода
-        document.getElementById("logoutBtn").addEventListener("click", function() {
-            // Удаляем токен из localStorage
-            localStorage.removeItem('token');
+        // Функция для управления видимостью пунктов меню
+        function updateMenuVisibility(role) {
+            // Получаем элементы навигации
+            const profileLink = document.getElementById('profileLink');
+            const componentsLink = document.getElementById('componentsLink');
+            const usersLink = document.getElementById('usersLink');
+            const rentLink = document.getElementById('rentLink');
+            const returnComponentsLink = document.getElementById('returnComponentsLink');
 
-            // Перенаправляем на страницу авторизации
-            window.location.href = "/authUser/login";
+            // Скрываем все элементы по умолчанию
+            profileLink.style.display = 'none'; // Профиль виден всегда
+            componentsLink.style.display = 'none';
+            usersLink.style.display = 'none';
+            rentLink.style.display = 'none';
+            returnComponentsLink.style.display = 'none';
+
+            // Логика отображения в зависимости от роли
+            if (role === 'Admin') {
+                componentsLink.style.display = 'inline-flex';
+                usersLink.style.display = 'inline-flex';
+            } else if (role === 'Teacher') {
+                componentsLink.style.display = 'inline-flex';
+                rentLink.style.display = 'inline-flex';
+                returnComponentsLink.style.display = 'inline-flex';
+            } else if (role === 'UNKNOWN' || !role) {
+                componentsLink.style.display = 'inline-flex'; // Только Комплектующие IRTSU
+            }
+        }
+
+        // Функция для запроса роли с сервера
+        function fetchUserRole() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                updateMenuVisibility('UNKNOWN'); // Если токена нет, считаем роль UNKNOWN
+                return;
+            }
+
+            fetch('/auth/role', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch role');
+                    }
+                    return response.text(); // Сервер возвращает строку
+                })
+                .then(role => {
+                    updateMenuVisibility(role || 'UNKNOWN'); // Если роль пуста, используем UNKNOWN
+                })
+                .catch(error => {
+                    console.error('Error fetching role:', error);
+                    updateMenuVisibility('UNKNOWN'); // При ошибке показываем минимум
+                });
+        }
+
+        // Вызываем запрос роли при загрузке страницы
+        document.addEventListener('DOMContentLoaded', fetchUserRole);
+
+        // Обработка выхода
+        document.getElementById('logoutBtn').addEventListener('click', function () {
+            localStorage.removeItem('token');
+            window.location.href = '/authUser/login';
         });
     </script>
 </header>

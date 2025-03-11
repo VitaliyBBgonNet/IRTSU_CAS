@@ -55,10 +55,6 @@ public class DetailsServiceImpl implements DetailsService {
 
         UsersEntity thisUser = userService.findUserEntityById(userService.getUserIdByToken());
 
-        if(thisUser == null) {
-            throw new CustomException(ErrorCodes.USER_NOT_FOUND);
-        }
-
         if(thisUser.getRole().equals(StringConstants.ADMIN_ROLE)){
             throw new CustomException(ErrorCodes.ACCESS_DENIED);
         }
@@ -74,6 +70,26 @@ public class DetailsServiceImpl implements DetailsService {
         detailsRepository.save(detail);
 
         return new SuccessResponse("Компонент отправлен на модерацию"+ detail.getId());
+    }
+
+    @Override
+    @Transactional
+    public SuccessResponse cancelModeration(String id) {
+
+        UsersEntity thisUser = userService.thisUser();
+
+        DetailsEntity detail = detailsRepository.findById(UUID.fromString(id))
+                .orElseThrow(() -> new CustomException(ErrorCodes.DETAIL_NOT_FOUND));
+
+        if (detail.getTenant().getId() != thisUser.getId() && !thisUser.getRole().equals(StringConstants.ADMIN_ROLE)) {
+            throw new CustomException(ErrorCodes.ACCESS_DENIED);
+        }
+
+        detail.setModerationStatus(StringConstants.CANCEL_MODERATION);
+
+        detailsRepository.save(detail);
+
+        return new SuccessResponse();
     }
 
     @Override

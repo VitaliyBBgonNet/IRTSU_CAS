@@ -16,4 +16,6 @@ public interface StringConstants {
     String TEACHER_ROLE = "Teacher";
 
     String ADMIN_ROLE = "Admin";
+
+    String CANCEL_MODERATION = "CANCEL";
 }

@@ -10,6 +10,7 @@ import bbgon.irtsu_cas.services.impl.ResourceService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -35,6 +36,14 @@ public class DetailsController {
             @RequestBody
             @Valid DetailProperties detail) {
         return ResponseEntity.ok(detailsService.createDetail(detail));
+    }
+
+    @PostMapping("/cancelModeration")
+    public ResponseEntity<SuccessResponse> cancelModeration(
+            @RequestParam(name = "id")
+            @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+                    message = "ID must be a valid UUID in the format 8-4-4-4-12 (e.g., 97600579-8050-4558-b743-37ffa249df52)") String id){
+        return ResponseEntity.ok(detailsService.cancelModeration(id));
     }
 
     @GetMapping("/getMyRentedComponents")
