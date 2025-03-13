@@ -3,6 +3,7 @@ package bbgon.irtsu_cas.services.impl;
 import bbgon.irtsu_cas.CustomException;
 import bbgon.irtsu_cas.constants.ErrorCodes;
 import bbgon.irtsu_cas.constants.StringConstants;
+import bbgon.irtsu_cas.dto.FIO;
 import bbgon.irtsu_cas.dto.request.DetailProperties;
 import bbgon.irtsu_cas.dto.request.UpdateDetailProperties;
 import bbgon.irtsu_cas.dto.response.*;
@@ -90,6 +91,25 @@ public class DetailsServiceImpl implements DetailsService {
         detailsRepository.save(detail);
 
         return new SuccessResponse();
+    }
+
+    @Override
+    @Transactional
+    public SuccessResponse rejectComponent(String componentId) {
+
+        UsersEntity thisUser = userService.thisUser();
+
+        DetailsEntity detail = detailsRepository.findById(UUID.fromString(componentId))
+                .orElseThrow(() -> new CustomException(ErrorCodes.DETAIL_NOT_FOUND));
+
+        if (!thisUser.getRole().equals(StringConstants.ADMIN_ROLE)) {
+            throw new CustomException(ErrorCodes.ACCESS_DENIED);
+        }
+
+        detail.setModerationStatus("REJECTED");
+        detailsRepository.save(detail);
+
+        return new SuccessResponse("REJECTED");
     }
 
     @Override
@@ -397,6 +417,10 @@ public class DetailsServiceImpl implements DetailsService {
                     tableElementResponse.setName(Optional.ofNullable(detail.getName()).orElse(" "));
                     tableElementResponse.setDescription(Optional.ofNullable(detail.getDescription()).orElse("-"));
                     tableElementResponse.setModerationStatus(Optional.ofNullable(detail.getModerationStatus()).orElse("-"));
+                    tableElementResponse.setTenantFIO(Optional.of(
+                            detail.getTenant().getLastName()+ " "
+                            + detail.getTenant().getName()+ " "
+                            + detail.getTenant().getSurname()).orElse("-"));
                     return tableElementResponse;
                 }).toList();
     }

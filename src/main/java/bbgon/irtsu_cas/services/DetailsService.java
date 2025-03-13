@@ -9,6 +9,8 @@ import java.util.UUID;
 
 public interface DetailsService {
 
+    SuccessResponse rejectComponent(String componentId);
+
     SuccessResponse approveComponent(String componentId);
 
     List<TableElementForReturnOwner> getComponentFromModeration();

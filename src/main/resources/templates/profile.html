@@ -81,7 +81,10 @@
             border: 1px solid #ced4da;
         }
         td.documentation-cell {
-            text-align: center; /* Центрирование иконки в ячейке */
+            text-align: center;
+        }
+        th {
+            cursor: pointer;
         }
     </style>
 </head>
@@ -146,6 +149,7 @@
                     <option value="У владельца">У владельца</option>
                 </select>
                 <input type="text" id="componentDocumentationFilter" class="form-control w-auto" placeholder="Ссылка на документацию">
+                <input type="text" id="rentedByFilter" class="form-control w-auto" placeholder="Имя арендатора">
                 <button type="submit" class="btn btn-primary">Выбрать</button>
                 <button id="loadTableBtn" class="btn btn-primary">Мои компоненты</button>
             </div>
@@ -168,9 +172,11 @@
             </thead>
             <tbody id="componentListBody"></tbody>
         </table>
+        <button id="exportToExcel" class="btn btn-success mt-2">Экспортировать в Excel</button>
     </div>
 </div>
 
+<!-- Модальное окно редактирования -->
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -218,6 +224,7 @@
     </div>
 </div>
 
+<!-- Модальное окно ошибки ссылки -->
 <div class="modal fade" id="invalidDocumentationModal" tabindex="-1" aria-labelledby="invalidDocumentationModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -235,6 +242,7 @@
 
 <script>
     let usersList = [];
+    let tableData = [];
 
     document.addEventListener("DOMContentLoaded", function() {
         fetch('/properties/getUsers', {
@@ -314,6 +322,10 @@
         });
 
         updateCharCount(editDescriptionTextarea, 'editCharRemaining', 'editDescriptionTooltip');
+
+        document.querySelectorAll('th').forEach((header, index) => {
+            header.addEventListener('click', () => sortTable(index, header));
+        });
     });
 
     document.body.addEventListener("htmx:responseError", function (event) {
@@ -436,12 +448,7 @@
 
     document.getElementById("filterForm").addEventListener("submit", function(event) {
         event.preventDefault();
-        const filterData = {
-            name: document.getElementById("componentNameFilter").value.trim(),
-            status: document.getElementById("componentStatusFilter").value,
-            documentation: document.getElementById("componentDocumentationFilter").value.trim()
-        };
-        loadTable(filterData);
+        applyFilters();
     });
 
     document.getElementById("loadTableBtn").addEventListener("click", function() {
@@ -465,46 +472,104 @@
                 return response.json();
             })
             .then(data => {
-                let tableBody = document.getElementById("componentListBody");
-                tableBody.innerHTML = "";
-                data.forEach(component => {
-                    let row = document.createElement("tr");
-                    let statusColor = component.status === "У владельца" ? "color: green;" :
-                        component.status === "В аренде" ? "color: red;" : "";
-                    let tenantId = component.tenant && component.tenant !== "-" ? component.tenant : null;
-                    let tenantName = tenantId ? (usersList.find(user => user.id === tenantId)?.fio || tenantId) : "-";
-                    row.innerHTML = `
-                        <td><p class="shortened-id">${component.id}</p></td>
-                        <td>${component.name}</td>
-                        <td>${component.description}</td>
-                        <td style="${statusColor}">${component.status}</td>
-                        <td>${component.owner || "—"}</td>
-                        <td data-tenant-id="${tenantId || ''}">${tenantName}</td>
-                        <td class="documentation-cell">
-                            <span class="documentation-link" data-documentation="${component.documentation || ''}">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-file-earmark-text" viewBox="0 0 16 16">
-                                    <path d="M5.5 7a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1zM5 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5"/>
-                                    <path d="M9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.5zm-5 0v1h5V0zM4 2h5v1H4zm0 3h5V4h-5zm8 9H4V5h8z"/>
-                                </svg>
-                            </span>
-                        </td>
-                        <td>
-                            <button style="margin: 2px" class="btn btn-danger" data-id="${component.id}">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
-                                    <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 0 0 .998-.06l-.5-8.5a.5.5 0 0 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"></path>
-                                </svg>
-                            </button>
-                            <button style="margin: 2px" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#exampleModal" data-id="${component.id}">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen-fill" viewBox="0 0 16 16">
-                                    <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001z"></path>
-                                </svg>
-                            </button>
-                        </td>
-                    `;
-                    tableBody.appendChild(row);
-                });
+                tableData = data;
+                renderTable(tableData);
             })
             .catch(error => console.error("Ошибка загрузки данных:", error));
+    }
+
+    function renderTable(data) {
+        const tableBody = document.getElementById("componentListBody");
+        tableBody.innerHTML = "";
+        data.forEach(component => {
+            let row = document.createElement("tr");
+            let statusColor = component.status === "У владельца" ? "color: green;" :
+                component.status === "В аренде" ? "color: red;" : "";
+            let tenantId = component.tenant && component.tenant !== "-" ? component.tenant : null;
+            let tenantName = tenantId ? (usersList.find(user => user.id === tenantId)?.fio || tenantId) : "-";
+            row.innerHTML = `
+                <td><p class="shortened-id">${component.id}</p></td>
+                <td>${component.name}</td>
+                <td>${component.description}</td>
+                <td style="${statusColor}">${component.status}</td>
+                <td>${component.owner || "—"}</td>
+                <td data-tenant-id="${tenantId || ''}">${tenantName}</td>
+                <td class="documentation-cell">
+                    <span class="documentation-link" data-documentation="${component.documentation || ''}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-file-earmark-text" viewBox="0 0 16 16">
+                            <path d="M5.5 7a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1zM5 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5"/>
+                            <path d="M9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.5zm-5 0v1h5V0zM4 2h5v1H4zm0 3h5V4h-5zm8 9H4V5h8z"/>
+                        </svg>
+                    </span>
+                </td>
+                <td>
+                    <button style="margin: 2px" class="btn btn-danger" data-id="${component.id}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                            <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 0 0 .998-.06l-.5-8.5a.5.5 0 0 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"></path>
+                        </svg>
+                    </button>
+                    <button style="margin: 2px" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#exampleModal" data-id="${component.id}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen-fill" viewBox="0 0 16 16">
+                            <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001z"></path>
+                        </svg>
+                    </button>
+                </td>
+            `;
+            tableBody.appendChild(row);
+        });
+    }
+
+    function sortTable(columnIndex, header) {
+        const isAscending = header.dataset.sort !== 'asc';
+        document.querySelectorAll('th').forEach(th => delete th.dataset.sort);
+        header.dataset.sort = isAscending ? 'asc' : 'desc';
+
+        const sortedData = [...tableData].sort((a, b) => {
+            let valueA, valueB;
+            switch(columnIndex) {
+                case 0: valueA = a.id; valueB = b.id; break;
+                case 1: valueA = a.name; valueB = b.name; break;
+                case 2: valueA = a.description; valueB = b.description; break;
+                case 3: valueA = a.status; valueB = b.status; break;
+                case 4: valueA = a.owner; valueB = b.owner; break;
+                case 5:
+                    valueA = usersList.find(user => user.id === a.tenant)?.fio || a.tenant || '-';
+                    valueB = usersList.find(user => user.id === b.tenant)?.fio || b.tenant || '-';
+                    break;
+                case 6: valueA = a.documentation; valueB = b.documentation; break;
+                default: return 0;
+            }
+
+            if (valueA === null || valueA === undefined) valueA = '';
+            if (valueB === null || valueB === undefined) valueB = '';
+
+            return isAscending ?
+                valueA.toString().localeCompare(valueB.toString()) :
+                valueB.toString().localeCompare(valueA.toString());
+        });
+
+        renderTable(sortedData);
+    }
+
+    function applyFilters() {
+        const nameFilter = document.getElementById("componentNameFilter").value.trim().toLowerCase();
+        const statusFilter = document.getElementById("componentStatusFilter").value;
+        const docFilter = document.getElementById("componentDocumentationFilter").value.trim().toLowerCase();
+        const tenantFilter = document.getElementById("rentedByFilter").value.trim().toLowerCase();
+
+        const filteredData = tableData.filter(component => {
+            const tenantName = component.tenant ?
+                (usersList.find(user => user.id === component.tenant)?.fio || component.tenant || '-').toLowerCase() : '-';
+
+            return (
+                (!nameFilter || component.name.toLowerCase().includes(nameFilter)) &&
+                (!statusFilter || component.status === statusFilter) &&
+                (!docFilter || component.documentation?.toLowerCase().includes(docFilter)) &&
+                (!tenantFilter || tenantName.includes(tenantFilter))
+            );
+        });
+
+        renderTable(filteredData);
     }
 
     document.getElementById("componentListBody").addEventListener("click", function(event) {
@@ -540,8 +605,8 @@
             const componentName = row.cells[1].textContent;
             const componentDescription = row.cells[2].textContent;
             const componentStatus = row.cells[3].textContent;
-            const tenantId = row.cells[5].getAttribute('data-tenant-id'); // Берем ID арендатора из атрибута
-            const tenantName = row.cells[5].textContent; // Отображаемое имя
+            const tenantId = row.cells[5].getAttribute('data-tenant-id');
+            const tenantName = row.cells[5].textContent;
             const componentDocumentation = row.cells[6].querySelector('.documentation-link').getAttribute('data-documentation');
 
             document.getElementById('editComponentId').value = componentId;
@@ -563,8 +628,8 @@
             if (componentStatus === "В аренде" && tenantId && tenantId !== '-') {
                 editRentedByField.style.display = "block";
                 const tenant = usersList.find(user => user.id === tenantId);
-                editRentedByInput.value = tenant ? tenant.fio : tenantName; // Устанавливаем имя из usersList или fallback
-                editRentedById.value = tenantId; // Устанавливаем ID арендатора
+                editRentedByInput.value = tenant ? tenant.fio : tenantName;
+                editRentedById.value = tenantId;
             } else {
                 editRentedByField.style.display = "none";
                 editRentedByInput.value = '';
@@ -591,7 +656,6 @@
         const editRentedById = document.getElementById("editRentedById");
         if (this.value === "В аренде") {
             rentedByField.style.display = "block";
-            // Оставляем текущее значение, если оно уже есть, иначе очищаем
             if (!editRentedByInput.value) {
                 editRentedByInput.value = '';
                 editRentedById.value = '';
@@ -658,6 +722,84 @@
         }
     });
 
+    document.getElementById("exportToExcel").addEventListener("click", function() {
+        // Собираем заголовки таблицы
+        const headers = Array.from(document.querySelectorAll(".table thead th"))
+            .filter((_, i) => i !== 7) // Исключаем колонку "Действие"
+            .map(th => th.textContent.trim());
+
+        // Собираем данные из таблицы
+        const visibleData = Array.from(document.querySelectorAll("#componentListBody tr"))
+            .map(row => {
+                return Array.from(row.cells)
+                    .filter((_, i) => i !== 7) // Исключаем колонку "Действие"
+                    .map(cell => {
+                        if (cell.classList.contains('documentation-cell')) {
+                            return cell.querySelector('.documentation-link').getAttribute('data-documentation') || '';
+                        }
+                        return cell.textContent.trim();
+                    });
+            });
+
+        // Создаем массив данных с заголовками
+        const data = [headers, ...visibleData];
+
+        // Создаем новую книгу и лист
+        const ws = XLSX.utils.aoa_to_sheet(data);
+
+        // Применяем стили
+        const colCount = headers.length;
+        const rowCount = visibleData.length + 1; // +1 для заголовка
+
+        // Голубая шапка (RGB: 41, 128, 185, HEX: #2980B9)
+        for (let col = 0; col < colCount; col++) {
+            const cellRef = XLSX.utils.encode_cell({ r: 0, c: col });
+            ws[cellRef].s = {
+                fill: {
+                    patternType: 'solid',
+                    fgColor: { rgb: '2980B9' }
+                },
+                font: {
+                    color: { rgb: 'FFFFFF' }, // Белый текст в шапке
+                    bold: true
+                }
+            };
+        }
+
+        // Красный текст для строк с статусом "В аренде" (RGB: 255, 0, 0, HEX: #FF0000)
+        visibleData.forEach((row, rowIndex) => {
+            if (row[3] === "В аренде") { // 3 - индекс столбца "Статус"
+                for (let col = 0; col < colCount; col++) {
+                    const cellRef = XLSX.utils.encode_cell({ r: rowIndex + 1, c: col });
+                    if (!ws[cellRef]) ws[cellRef] = { v: row[col] }; // Убедимся, что ячейка существует
+                    ws[cellRef].s = {
+                        font: {
+                            color: { rgb: 'FF0000' }
+                        }
+                    };
+                }
+            }
+        });
+
+        // Устанавливаем ширину столбцов (опционально)
+        ws['!cols'] = [
+            { wch: 10 }, // ID
+            { wch: 20 }, // Имя компонента
+            { wch: 30 }, // Описание
+            { wch: 15 }, // Статус
+            { wch: 20 }, // Владелец
+            { wch: 20 }, // Арендатор
+            { wch: 30 }  // Документация
+        ];
+
+        // Создаем книгу и добавляем лист
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Components");
+
+        // Экспортируем файл
+        XLSX.writeFile(wb, `components_report_${new Date().toISOString().slice(0,10)}.xlsx`);
+    });
+
     document.addEventListener("DOMContentLoaded", function () {
         const exampleModal = document.getElementById("exampleModal");
         exampleModal.addEventListener("hidden.bs.modal", function () {
@@ -684,5 +826,6 @@
 
 <script src="https://unpkg.com/htmx.org@1.8.4"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </body>
 </html>

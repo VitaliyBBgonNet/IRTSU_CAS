@@ -51,7 +51,15 @@ public class DetailsController {
             @RequestParam(name = "id")
             @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
                     message = "ID must be a valid UUID in the format 8-4-4-4-12 (e.g., 97600579-8050-4558-b743-37ffa249df52)") String id) {
-                return ResponseEntity.ok(detailsService.approveComponent(id));
+        return ResponseEntity.ok(detailsService.approveComponent(id));
+    }
+
+    @PostMapping("/rejectComponent")
+    public ResponseEntity<SuccessResponse> rejectComponent(
+            @RequestParam(name = "id")
+            @Pattern(regexp = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+                    message = "ID must be a valid UUID in the format 8-4-4-4-12 (e.g., 97600579-8050-4558-b743-37ffa249df52)") String id) {
+        return ResponseEntity.ok(detailsService.rejectComponent(id));
     }
 
     @GetMapping("/getComponentFromModeration")

@@ -16,7 +16,8 @@
             cursor: pointer;
         }
         .status-yellow { background-color: #ffc107; }  /* На модерации */
-        .status-red { background-color: #dc3545; }     /* Не на модерации */
+        .status-red { background-color: #dc3545; }     /* Отклонено (REJECTED) */
+        .status-green { background-color: #28a745; }   /* Отменено (CANCEL) */
     </style>
 </head>
 <body>
@@ -66,11 +67,17 @@
     }
 
     function getStatusClass(moderationStatus) {
-        return moderationStatus === 'MODERATION' ? 'status-yellow' : 'status-red';
+        if (moderationStatus === 'MODERATION') return 'status-yellow';
+        if (moderationStatus === 'CANCEL') return 'status-green';
+        if (moderationStatus === 'REJECTED') return 'status-red';
+        return 'status-red'; // По умолчанию красный, если статус неизвестен
     }
 
     function getTooltipText(moderationStatus) {
-        return moderationStatus === 'MODERATION' ? 'На модерации' : 'Не отправлен на модерацию';
+        if (moderationStatus === 'MODERATION') return 'На модерации';
+        if (moderationStatus === 'CANCEL') return 'Отменено';
+        if (moderationStatus === 'REJECTED') return 'Отклонено';
+        return 'Не отправлен на модерацию';
     }
 
     function loadTable() {

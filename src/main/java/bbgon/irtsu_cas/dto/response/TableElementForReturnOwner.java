@@ -15,4 +15,6 @@ public class TableElementForReturnOwner {
     private String description;
 
     private String moderationStatus;
+
+    private String tenantFIO;
 }
