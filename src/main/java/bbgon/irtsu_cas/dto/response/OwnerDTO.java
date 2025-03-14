@@ -19,7 +19,7 @@ public class OwnerDTO {
     private String surname;
     private String email;
     private String position;
-    private String avtar;
+    private String avatar;
     private String phone;
     private String department;
 }

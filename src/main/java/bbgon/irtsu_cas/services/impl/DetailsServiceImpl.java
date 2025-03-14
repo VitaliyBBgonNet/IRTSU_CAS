@@ -3,7 +3,6 @@ package bbgon.irtsu_cas.services.impl;
 import bbgon.irtsu_cas.CustomException;
 import bbgon.irtsu_cas.constants.ErrorCodes;
 import bbgon.irtsu_cas.constants.StringConstants;
-import bbgon.irtsu_cas.dto.FIO;
 import bbgon.irtsu_cas.dto.request.DetailProperties;
 import bbgon.irtsu_cas.dto.request.UpdateDetailProperties;
 import bbgon.irtsu_cas.dto.response.*;
@@ -403,7 +402,7 @@ public class DetailsServiceImpl implements DetailsService {
         ownerDTO.setName(detailsEntity.getOwner().getName());
         ownerDTO.setLastName(detailsEntity.getOwner().getLastName());
         ownerDTO.setSurname(detailsEntity.getOwner().getSurname());
-        ownerDTO.setAvtar(detailsEntity.getOwner().getName());
+        ownerDTO.setAvatar(detailsEntity.getOwner().getName());
         ownerDTO.setEmail(detailsEntity.getOwner().getEmail());
         ownerDTO.setPhone(detailsEntity.getOwner().getPhone());
         return ownerDTO;
