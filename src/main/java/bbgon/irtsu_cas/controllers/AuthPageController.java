@@ -37,7 +37,7 @@ public class AuthPageController {
     @GetMapping("/registration")
     public String registration(Model model) {
         model.addAttribute("registerForm", new RegistrationUserRequest());
-        return "registration-user";
+        return "You can't register yet";
     }
 
     @GetMapping("/takeComponent")

@@ -1,4 +1,4 @@
-CREATE TABLE details
+CREATE TABLE details_entity
 (
     id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     image             VARCHAR(255),

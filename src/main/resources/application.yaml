@@ -2,9 +2,9 @@ spring:
   application:
     name: IRTSU_CAS
   datasource:
-    url: jdbc:postgresql://localhost:5432/CAS
-    username: postgres
-    password: admin
+    url: jdbc:postgresql://localhost:5432/cas
+    username: bbgon
+    password: '!@QWASZX'
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:

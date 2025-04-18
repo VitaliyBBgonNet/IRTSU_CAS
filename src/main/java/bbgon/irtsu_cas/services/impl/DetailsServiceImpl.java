@@ -265,11 +265,19 @@ public class DetailsServiceImpl implements DetailsService {
 
     @Override
     public CustomSuccessResponse<String> createDetail(DetailProperties detailProperties) {
+
+        if (userService.thisUser().getRole() == null
+                || userService.thisUser().getRole().isEmpty()
+                || !userService.thisUser().getRole().equals(StringConstants.ADMIN_ROLE)) {
+            throw new CustomException(ErrorCodes.ACCESS_DENIED);
+        }
+
         if (detailProperties == null) {
             throw new CustomException(ErrorCodes.UNKNOWN);
         }
 
         UUID ownerId = userService.getUserIdByToken();
+
         if (ownerId == null) {
             throw new CustomException(ErrorCodes.USER_NOT_FOUND);
         }

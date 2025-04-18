@@ -7,5 +7,5 @@ CREATE TABLE rent
     end_date      TIMESTAMP,
     rental_status VARCHAR(255),
     FOREIGN KEY (user_id) REFERENCES users_entity (id) ON DELETE RESTRICT,
-    FOREIGN KEY (detail_id) REFERENCES details (id) ON DELETE CASCADE
+    FOREIGN KEY (detail_id) REFERENCES details_entity (id) ON DELETE CASCADE
 );
