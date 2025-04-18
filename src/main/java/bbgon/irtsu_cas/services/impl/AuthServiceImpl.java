@@ -82,6 +82,8 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public String getRole() {
         UsersEntity thisUser = userService.thisUser();
-        return Optional.of(thisUser.getRole()).orElse("UNKNOWN");
+        return Optional.ofNullable(thisUser)
+                .map(UsersEntity::getRole)
+                .orElse("UNKNOWN");
     }
 }

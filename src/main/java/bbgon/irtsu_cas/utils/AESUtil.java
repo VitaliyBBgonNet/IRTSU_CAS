@@ -14,7 +14,6 @@ public class AESUtil {
     private static final String ALGORITHM = "AES";
     private final SecretKey secretKey;
 
-    // Загружаем ключ из application.properties
     public AESUtil(@Value("${aes.secret-key}") String encodedKey) {
         this.secretKey = decodeKey(encodedKey);
     }
