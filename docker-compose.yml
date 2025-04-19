@@ -1,33 +1,123 @@
-version: '3.8'
-
 services:
+  loki:
+    image: grafana/loki:2.9.0
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - loki
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3100/ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped  # Добавляем политику перезапуска
+
+  promtail:
+    image: grafana/promtail:2.9.0
+    volumes:
+      - ./promtail-config.yaml:/etc/promtail/promtail.yaml
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: -config.file=/etc/promtail/promtail.yaml
+    networks:
+      - loki
+    depends_on:
+      - loki
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:9080/targets"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+    networks:
+      - loki
+    depends_on:
+      - app
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:9090/-/healthy"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped  # Добавляем политику перезапуска
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+    depends_on:
+      - loki
+      - prometheus
+    networks:
+      - loki
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped  # Добавляем политику перезапуска
 
   db:
     image: postgres:latest
     container_name: postgres_db
     environment:
       POSTGRES_USER: bbgon
-      POSTGRES_PASSWORD: '!@QWASZX'
+      POSTGRES_PASSWORD: admin
       POSTGRES_DB: cas
     ports:
       - "5432:5432"
     volumes:
       - ./init-scripts:/docker-entrypoint-initdb.d
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - loki
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bbgon"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped  # Добавляем политику перезапуска
 
   app:
     build:
       context: .
+      dockerfile: Dockerfile
     container_name: spring_boot_app
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/cas
       SPRING_DATASOURCE_USERNAME: bbgon
-      SPRING_DATASOURCE_PASSWORD: '!@QWASZX'
+      SPRING_DATASOURCE_PASSWORD: admin
       SPRING_PROFILES_ACTIVE: prod
+    labels:
+      app: IRTSU_CAS  # Метка для Promtail
     ports:
       - "8080:8080"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+    networks:
+      - loki
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped  # Добавляем политику перезапуска
 
 volumes:
   postgres_data:
+  prometheus_data:
+
+networks:
+  loki:
+    driver: bridge

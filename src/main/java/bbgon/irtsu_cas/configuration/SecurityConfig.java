@@ -26,6 +26,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/actuator/**").permitAll()
                         .requestMatchers("/docs").permitAll()
                         .requestMatchers("authUser/takeComponent").permitAll()
                         .requestMatchers("/addNewDetail").permitAll()

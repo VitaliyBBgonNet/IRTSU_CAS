@@ -3,7 +3,7 @@ LABEL authors="vital_goncharov"
 
 WORKDIR /app
 
-COPY ./IRTSU_CAS-0.0.1-SNAPSHOT.jar /app/IRTSU_CAS-0.0.1-SNAPSHOT.jar
+COPY build/libs/IRTSU_CAS-0.0.1-SNAPSHOT.jar /app/IRTSU_CAS-0.0.1-SNAPSHOT.jar
 
 EXPOSE 8080
 
